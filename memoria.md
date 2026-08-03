@@ -134,5 +134,11 @@ Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
       "Liquidación de orden", montos negativos y anulaciones son ejemplos de
       entrenamiento válidos, ruido a excluir, o una tarea aparte? — **Bloquea**
       la construcción del dataset limpio en Fase 1.
-- [ ] **P6 — Hoja 63800010 (esquema distinto).** ¿Entra en el alcance inicial o
-      se trata por separado / se posterga? — Afecta el alcance de Fase 1.
+- [~] **P6 — Hoja 63800010 (esquema distinto).** ✅ PARCIAL: el usuario indicó
+      **filtrar solo a `Imputación = TGCI-2601`** (757 de 1094 filas). Pendiente
+      confirmar el **target** de esta hoja: tiene una **columna final sin
+      encabezado (col 27 / AA)** con 8 valores tipo `Relevamiento_N&P_Chiqui Ri
+      2025` (+107 nulos), que espeja el patrón de la columna T de las otras
+      hojas. **P6b (abierta):** ¿el target de esta hoja es esa columna AA? ¿Y qué
+      se hace con las 107 filas sin valor? Además su esquema de features difiere
+      por completo del de las hojas 65910001-04.

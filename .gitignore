@@ -1,4 +1,4 @@
-# Datos crudos sensibles (data financiera real de TGP) — NO versionar hasta
+# Datos crudos sensibles (data financiera real) — NO versionar hasta
 # decisión explícita del usuario (ver memoria.md §5, pregunta P2).
 data/raw/
 data/processed/
@@ -19,3 +19,6 @@ models/*.bin
 # SO / editor
 .DS_Store
 .vscode/
+
+# Data de entrenamiento y validación (si se genera)
+.xlsx

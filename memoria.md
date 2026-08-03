@@ -109,6 +109,77 @@ Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
   modelado. Nombre canónico a asignar a la columna T (no tiene header) →
   propuesta: `clasificacion_controller` (a confirmar al armar el contrato §4).
 
+### D4 — La data financiera real NUNCA se commitea
+- **Decisión:** el Excel fuente y cualquier derivado con data financiera real de
+  TGP **no se versionan en git bajo ninguna circunstancia** (ni en repo privado,
+  ni anonimizados "por si acaso"). Viven solo en local: `data/raw/`,
+  `data/processed/`, `models/` permanecen en `.gitignore`.
+- **Razón:** el usuario lo definió como restricción dura. Es información
+  financiera real de la empresa.
+- **Alternativas rechazadas:** versionar en repo privado (un repo privado puede
+  volverse público o compartirse por error); versión anonimizada commiteada
+  (la anonimización es reversible por cruce y agrega superficie de riesgo).
+- **Impacto:** `.gitignore` es parte del contrato, no una conveniencia. Todo
+  artefacto que se commitea (código, docs, métricas agregadas) debe estar libre
+  de filas de datos. Antes de cada commit: verificar que no haya data staged
+  (`datos.md ##6.7`). Los ejemplos que se peguen en docs deben ser sintéticos o
+  agregados, no filas reales.
+
+### D5 — Alcance: un modelo por cuenta contable
+- **Decisión:** se entrena **un modelo independiente por cuenta contable**
+  (65910001, 65910002, 65910003, 65910004 y 63800010), no un modelo global
+  multi-cuenta.
+- **Razón:** cada cuenta tiene su propio espacio de etiquetas en la columna T
+  (ver §2) y su propia semántica de negocio; mezclarlas obligaría al modelo a
+  aprender primero a qué cuenta pertenece cada línea, cuando la cuenta ya se
+  conoce en tiempo de inferencia.
+- **Alternativas rechazadas:** modelo global con `Cuenta` como feature
+  (comparte señal entre cuentas pero diluye espacios de etiquetas disjuntos);
+  posponer la decisión al EDA (el usuario la cerró ahora).
+- **Impacto:** la partición train/valid/test se hace **dentro de cada cuenta**;
+  las métricas se reportan por cuenta (no promediadas a ciegas); habrá N
+  artefactos de modelo en `models/`. La cuenta 65910002 (~61 filas, 10 clases)
+  queda con muy pocos datos → se documentará su limitación en Fase 2 en vez de
+  fingir una métrica. Pendiente: si el EDA muestra que algunas cuentas comparten
+  etiquetas, se podrá proponer compartir representación de texto — sería una
+  decisión nueva, no un cambio silencioso.
+
+### D6 — Todas las líneas se clasifican (no hay filas "de descarte")
+- **Decisión:** las filas de "Reclasificación", "Liquidación de orden", montos
+  negativos y anulaciones son **ejemplos de entrenamiento válidos**. Todo
+  concepto debe quedar clasificado; no se excluyen filas del dataset por ser
+  atípicas contablemente.
+- **Razón:** el usuario lo definió: en la operación real el controller clasifica
+  todas las líneas, así que el modelo debe hacer lo mismo. Excluirlas crearía un
+  modelo que falla justo en los casos que el humano igual tiene que resolver.
+- **Alternativas rechazadas:** filtrarlas como ruido (dejaría un hueco en
+  producción); tratarlas como tarea aparte (duplica el sistema sin necesidad
+  demostrada).
+- **Impacto:** el dataset limpio conserva estas filas. El signo del monto
+  (`US$` negativo) y la naturaleza del documento son **features**, no criterios
+  de filtrado. Al medir, revisar por separado el desempeño en estas filas: si el
+  modelo falla sistemáticamente ahí, es hallazgo a reportar, no motivo para
+  excluirlas.
+
+### D7 — Hoja 63800010: target = columna AA; las filas sin valor quedan fuera
+- **Decisión:** la hoja `63800010_Ser. Imagen Satelital` entra al alcance,
+  filtrada a `Imputación = TGCI-2601` (757 de 1094 filas). Su target es la
+  **columna final sin encabezado (col 27 / AA)**, análoga a la columna T de las
+  otras hojas. Las **107 filas sin valor en AA se dejan en blanco**: no se usan
+  para entrenar y el modelo **tampoco las predice** (quedan fuera del alcance de
+  inferencia).
+- **Razón:** el usuario lo confirmó. Las filas en blanco no representan una
+  clasificación del controller, así que no son ni ejemplo de entrenamiento ni
+  caso a resolver.
+- **Alternativas rechazadas:** dejar la hoja fuera del proyecto; tratar las 107
+  filas en blanco como una clase más o pedir que el modelo las clasifique.
+- **Impacto:** esta cuenta tiene un esquema de features **completamente
+  distinto** (export SAP) → su pipeline de features es propio, coherente con D5
+  (un modelo por cuenta). Convive con D6 sin contradicción: D6 dice que no se
+  descartan filas por ser contablemente atípicas; aquí se excluyen filas **sin
+  target**, que es otra cosa. Definir en Fase 1 el criterio exacto de "sin
+  valor" (nulo vs. cadena vacía vs. espacios).
+
 ## 4. Contrato de datos / estructura (se llena en Fase 1)
 > Pendiente hasta cerrar §5 P1 (target) y hacer el EDA. Aquí vivirán: columnas
 > oficiales, tipos, qué es feature, qué es target, y qué columnas están
@@ -118,27 +189,18 @@ Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
 - [x] **P1 — Variable objetivo.** ✅ RESUELTA → **D3**: el target es la columna
       T (clasificación granular del controller). La columna S (`Concepto`) es un
       feature que viene de SAP.
-- [ ] **P2 — Sensibilidad de datos.** El Excel tiene data financiera real de
-      TGP. ¿Se versiona en git (repo privado), se mantiene fuera (`.gitignore`,
-      default actual), o solo una versión anonimizada? — **Bloquea** decidir qué
-      se commitea.
-- [ ] **P3 — Alcance del modelo.** ¿Un modelo por cuenta contable (espacios de
-      etiquetas separados) o un modelo global multi-cuenta con la cuenta como
-      feature? ¿O se decide tras el EDA? — **Bloquea** la arquitectura de
-      modelado y la partición de datos.
+- [x] **P2 — Sensibilidad de datos.** ✅ RESUELTA → **D4**: la data financiera
+      real **nunca** se commitea; vive solo en local (`.gitignore`).
+- [x] **P3 — Alcance del modelo.** ✅ RESUELTA → **D5**: un modelo independiente
+      por cuenta contable.
 - [ ] **P4 — Diseño del loop humano-en-el-medio.** ¿Aprendizaje activo (el
       modelo pregunta solo lo de baja confianza y re-entrena), validación por
       lotes, o se diseña más adelante con una propuesta del agente? — **Bloquea**
       la Fase 4.
-- [ ] **P5 — Tratamiento de filas especiales.** ¿"Reclasificación",
-      "Liquidación de orden", montos negativos y anulaciones son ejemplos de
-      entrenamiento válidos, ruido a excluir, o una tarea aparte? — **Bloquea**
-      la construcción del dataset limpio en Fase 1.
-- [~] **P6 — Hoja 63800010 (esquema distinto).** ✅ PARCIAL: el usuario indicó
-      **filtrar solo a `Imputación = TGCI-2601`** (757 de 1094 filas). Pendiente
-      confirmar el **target** de esta hoja: tiene una **columna final sin
-      encabezado (col 27 / AA)** con 8 valores tipo `Relevamiento_N&P_Chiqui Ri
-      2025` (+107 nulos), que espeja el patrón de la columna T de las otras
-      hojas. **P6b (abierta):** ¿el target de esta hoja es esa columna AA? ¿Y qué
-      se hace con las 107 filas sin valor? Además su esquema de features difiere
-      por completo del de las hojas 65910001-04.
+- [x] **P5 — Tratamiento de filas especiales.** ✅ RESUELTA → **D6**: son
+      ejemplos válidos; todos los conceptos deben clasificarse.
+- [x] **P6 — Hoja 63800010 (esquema distinto).** ✅ RESUELTA → **D7**: filtrar a
+      `Imputación = TGCI-2601`, target = columna AA, y las 107 filas sin valor
+      quedan fuera (no se entrenan ni se predicen).
+
+> Única pregunta viva: **P4**. No bloquea la Fase 1.

@@ -18,9 +18,15 @@ de la Fase 1. Cuando arranque el modelado se creará `modelo.md` como par.
   (artefactos). Todos salvo `src/` están gitignored por defecto.
 
 ## 2. Consolidación y limpieza (convenciones)
-- Consolidar las hojas de detalle homogéneas (65910001–04) en un solo DataFrame,
-  agregando la `Cuenta` como columna. La hoja `63800010` tiene otro esquema:
-  tratarla aparte hasta resolver `memoria.md §5 P6`.
+- Consolidar las hojas de detalle homogéneas (65910001–04) en un solo DataFrame
+  **tipado**, agregando la `Cuenta` como columna. Ojo: consolidar es para
+  limpiar y explorar de forma uniforme; el entrenamiento es **por cuenta**
+  (`memoria.md D5`). La hoja `63800010` tiene otro esquema y su propio target
+  (`memoria.md D7`): pipeline aparte, filtrada a `Imputación = TGCI-2601` y sin
+  las filas con AA vacía.
+- **No se descartan filas por ser contablemente atípicas** (reclasificaciones,
+  liquidaciones, montos negativos, anulaciones): son ejemplos válidos
+  (`memoria.md D6`). La única exclusión permitida es "fila sin target" (D7).
 - Tipar explícitamente: fechas a `datetime`, montos (`US$`, `NSO`) a numérico,
   categóricas a `category`, IDs a string (no numérico — no son cantidades).
 - **Nunca modificar el crudo.** Toda limpieza produce un artefacto nuevo en
@@ -52,9 +58,10 @@ consecuencia, es leakage y se prohíbe.
   peor que nada: engaña al usuario).
 
 ## 5. Partición y validación (anti-overfitting)
+- La partición se hace **dentro de cada cuenta contable** (`memoria.md D5`): no
+  se mezclan cuentas en train/test, y las métricas se reportan por cuenta.
 - Definir el esquema de validación **antes** de entrenar y documentarlo en
-  `memoria.md`. Candidatos según decisión de alcance (`§5 P3`) y naturaleza del
-  dato:
+  `memoria.md`. Candidatos según la naturaleza del dato:
   - Si hay señal temporal (columna `Periodo`/`Fecha`): considerar validación
     temporal (entrenar en meses previos, validar en posteriores) para simular
     uso real.

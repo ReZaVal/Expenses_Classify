@@ -20,16 +20,18 @@ referencia a `memoria.md`. Si el cambio es porque se detectó un error,
 regístralo en `learn.md` antes de corregirlo en silencio.
 
 ## Contexto activo (lo primero que se lee al arrancar; mantener corto)
-- **En qué estoy:** Harness instalado. Reconocimiento del Excel hecho. **Target
-  confirmado (D3): columna T** (clasificación granular del controller); columna
-  S (`Concepto`) es feature de SAP. Quedan abiertas P2..P6 en `memoria.md §5`.
-- **Cambió en la última sesión:** Se creó el harness completo (agente/manager/
-  memoria/learn/datos + CLAUDE.md/AGENTS.md/.gitignore). Se documentó estructura
-  de datos y distribución del target en `memoria.md §2`. Se cerró P1 → D3.
+- **En qué estoy:** Fase 0 cerrada. **Fase 1 (EDA + contrato de datos) lista
+  para arrancar.** Decisiones vigentes: target = columna T (D3); data real nunca
+  se commitea (D4); **un modelo por cuenta contable** (D5); todas las líneas se
+  clasifican, incluidas reclasificaciones/negativos/anulaciones (D6); hoja
+  63800010 con target en col AA y sus 107 filas sin valor fuera (D7).
+- **Cambió en la última sesión:** Se cerraron P2, P3, P5 y P6 → **D4, D5, D6,
+  D7**. Solo queda abierta P4 (diseño del loop humano-en-el-medio), que no
+  bloquea la Fase 1.
 - **Próximos pasos:**
-  1. Resolver con el usuario P2 (data en git), P3 (alcance), P5 (filas
-     especiales), P6 (hoja 63800010). P4 (loop) puede esperar a Fase 4.
-  2. Con P3/P5 definidos, arrancar Fase 1 (EDA + contrato de datos).
+  1. Fase 1: script reproducible de carga/consolidación en `src/` (data local,
+     nunca commiteada) + EDA por cuenta.
+  2. Auditar leakage y cerrar el contrato de datos en `memoria.md §4`.
 
 ## Mapa de extractos por fase (qué leer/tocar sin abrir todo)
 Convención de anclas: `memoria.md` → `§n` y `Dn`; docs de dominio → `## n`;
@@ -46,7 +48,7 @@ no existe donde dice esta tabla, es un error de la tabla → corregirla aquí.
 ### Fase 1 — EDA + contrato de datos
 | Tarea | Leer (contrato/decisión) | Tocar |
 |---|---|---|
-| Definir target | `memoria.md §5 P1` | `memoria.md §3` (nueva `Dn`) |
+| Cargar/consolidar | `datos.md ##1` + `##2` + `memoria.md D5..D7` | `src/` |
 | EDA / correlaciones | `datos.md ##2` + `##3` | `notebooks/` o `src/eda.py` |
 | Detectar leakage | `datos.md ##4` | `memoria.md §4` (contrato de datos) |
 
@@ -55,11 +57,13 @@ no existe donde dice esta tabla, es un error de la tabla → corregirla aquí.
 Dueño: `agente.md` + `datos.md`.
 - [x] Instalar los 4 documentos núcleo + entrada `CLAUDE.md`/`AGENTS.md`.
 - [x] Reconocimiento inicial de la estructura del Excel.
-- [ ] Resolver las 4 preguntas fundacionales con el usuario (`memoria.md §5`).
-Criterio de salida: harness instalado y las 4 preguntas `P1..P4` respondidas y
-promovidas a decisiones `Dn`.
+- [x] Resolver las preguntas fundacionales con el usuario (`memoria.md §5`):
+      P1→D3, P2→D4, P3→D5, P5→D6, P6→D7. **P4 (loop humano-en-el-medio) se
+      pospone a la Fase 4 por decisión de orden**, no bloquea nada antes.
+Criterio de salida: harness instalado y preguntas fundacionales promovidas a
+decisiones `Dn`. ✅ cumplido.
 
-### Fase 1 — EDA + contrato de datos ⬅ siguiente
+### Fase 1 — EDA + contrato de datos ⬅ ACTIVA
 Dueño: `datos.md`.
 - [ ] Consolidar las hojas de detalle en un dataset limpio y tipado.
 - [ ] EDA: distribución de clases (desbalance ya visible), cardinalidad de
@@ -105,8 +109,8 @@ sin ayuda del agente.
 ## Estado actual (actualizar en cada sesión)
 | Fase | Estado |
 |---|---|
-| 0 — Harness + reconocimiento | 🟡 en curso (faltan las 4 preguntas fundacionales) |
-| 1 — EDA + contrato de datos | ⬜ no iniciada |
+| 0 — Harness + reconocimiento | ✅ completada (D1–D7) |
+| 1 — EDA + contrato de datos | 🟡 en curso |
 | 2 — Baseline + feature eng. | ⬜ no iniciada |
 | 3 — Validación robusta | ⬜ no iniciada |
 | 4 — Loop humano-en-el-medio | ⬜ no iniciada |

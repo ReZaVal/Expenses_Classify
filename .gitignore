@@ -1,0 +1,21 @@
+# Datos crudos sensibles (data financiera real de TGP) — NO versionar hasta
+# decisión explícita del usuario (ver memoria.md §5, pregunta P2).
+data/raw/
+data/processed/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+*.egg-info/
+
+# Modelos y artefactos pesados
+*.pkl
+*.joblib
+models/*.bin
+
+# SO / editor
+.DS_Store
+.vscode/

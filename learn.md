@@ -21,6 +21,7 @@ registra decisiones): esto registra errores.
 | ID | Resumen del error | Regla derivada | Dónde vive ahora |
 |----|-------------------|----------------|-------------------|
 | L1 | Riesgo de escribir data sensible (cuentas, conceptos, empresa) en docs versionados | Solo seudónimos en lo versionado; valores reales solo en `glosario_sensibles.md` (gitignored) | `memoria.md D4`, `manager.md` (regla de prioridad), `agente.md §4` |
+| L2 | Se seudonimizó sin crear antes el glosario: el mapa real se perdió al cerrar la sesión | El glosario se crea **antes** de aplicar el primer seudónimo, en el mismo cambio | `glosario_sensibles.md §5`, `agente.md §4` |
 
 ## 2. Log de errores
 ### L1 — Data sensible podría filtrarse a GitHub vía los docs del harness
@@ -40,6 +41,26 @@ registra decisiones): esto registra errores.
   concepto/programa, empresa, códigos internos); si aparece uno nuevo, agregarlo
   primero al glosario y usar su seudónimo. → propagada a `manager.md` (regla de
   prioridad, se lee al arrancar) y `agente.md §4`.
+
+### L2 — Se aplicó la seudonimización antes de que existiera el glosario
+- **Estado:** ✅ Resuelto (glosario reconstruido y regla incorporada)
+- **Detectado en:** sesión del 2026-08-03, al integrar el trabajo de GitHub con
+  el local: los docs ya usaban `CONCEPTO_001…006` pero `glosario_sensibles.md`
+  no existía en el repo local.
+- **Síntoma:** los seudónimos eran irreversibles. Nadie —ni el usuario, ni una
+  sesión futura— podía saber a qué concepto real correspondía `CONCEPTO_003`.
+- **Causa raíz:** el commit `83f9a51` aplicó los seudónimos y dejó el glosario
+  "para después"; como el archivo es gitignored, no viajó con el repo y el mapa
+  solo existía en el contexto de aquella sesión, que se cerró.
+- **Solución aplicada:** se reconstruyó el glosario contra el Excel fuente,
+  **verificando cada mapeo con los conteos ya documentados** en `memoria.md §2`
+  (264/950, 19/61, 125/270, 716/2240) en vez de asignarlo por parecido de
+  nombre. Se añadió `mapeo_sensibles.json` como versión máquina para el código.
+- **Regla derivada:** **el glosario se crea antes de aplicar el primer
+  seudónimo, en el mismo cambio.** Seudonimizar sin registrar el mapa no es
+  proteger un dato: es destruirlo. Corolario: como el glosario nunca sube a
+  GitHub, cada sesión debe verificar que existe **antes** de tocar nada
+  sensible. → propagada a `glosario_sensibles.md §5` y `agente.md §4`.
 
 ## 3. Errores de comportamiento del agente
 (Mismo formato que §2, pero para cuando el agente que dirige el proyecto asumió,

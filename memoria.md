@@ -222,4 +222,14 @@ clasificación **granular** que asigna el controller (ej. `CONCEPTO_001`,
       `Imputación = IMP_01`, target = columna AA, y las 107 filas sin valor
       quedan fuera (no se entrenan ni se predicen).
 
-> Única pregunta viva: **P4**. No bloquea la Fase 1.
+- [ ] **P7 — Filas sin `ID` ni target (¿totales al pie de hoja?).** El loader
+      detecta **115 filas** sin identificador y sin clasificación
+      (`CUENTA_01`: 4, `CUENTA_02`: 2, `CUENTA_03`: 6, `CUENTA_04`: 103) y las
+      **reporta sin eliminarlas**. La hipótesis es que son filas de
+      total/subtotal al pie de cada hoja, no gasto real — explicarían la
+      diferencia entre las filas del Excel y las documentadas en §2. ¿Se
+      excluyen del dataset? Excluirlas **no** contradice D7 (que habla de filas
+      contablemente atípicas, no de filas que no son un gasto), pero es
+      decisión del usuario. — **Bloquea** cerrar el contrato de datos (§4).
+
+> Preguntas vivas: **P4** (no bloquea) y **P7** (bloquea el contrato de datos).

@@ -31,20 +31,23 @@ referencia a `memoria.md`. Si el cambio es porque se detectó un error,
 regístralo en `learn.md` antes de corregirlo en silencio.
 
 ## Contexto activo (lo primero que se lee al arrancar; mantener corto)
-- **En qué estoy:** Fase 0 cerrada. **Fase 1 (EDA + contrato de datos) lista
-  para arrancar.** Decisiones vigentes: target = columna T (D3); seudonimización
+- **En qué estoy:** **Fase 1 en curso.** El loader reproducible ya está en
+  `src/` con 18 tests en verde; falta el EDA y el contrato de datos.
+  Decisiones vigentes: target = columna T (D3); seudonimización
   obligatoria en lo versionado (D4); data real nunca se commitea (D5); **un
   modelo por cuenta contable** (D6); todas las líneas se clasifican, incluidas
   reclasificaciones/negativos/anulaciones (D7); hoja CUENTA_05 con target en col
   AA y sus 107 filas sin valor fuera (D8).
-- **Cambió en la última sesión:** Se cerraron P2, P3, P5 y P6 → **D5, D6, D7,
-  D8** (renumeradas al integrar el `D4` de seudonimización publicado en GitHub).
-  Solo queda abierta P4 (diseño del loop humano-en-el-medio), que no bloquea la
-  Fase 1.
+- **Cambió en la última sesión:** Se integró el `D4` de seudonimización que
+  estaba en GitHub con el cierre local de Fase 0 → las decisiones locales se
+  renumeraron a **D5–D8**. Se creó `mapeo_sensibles.json` (local, gitignored)
+  como versión máquina del glosario, y se construyó el loader (`src/config.py`,
+  `src/loader.py`, `src/build_dataset.py`). Sigue abierta solo P4.
 - **Próximos pasos:**
-  1. Fase 1: script reproducible de carga/consolidación en `src/` (data local,
-     nunca commiteada) + EDA por cuenta.
-  2. Auditar leakage y cerrar el contrato de datos en `memoria.md §4`.
+  1. **P7 (nueva, abierta):** decidir qué hacer con las 115 filas sin `ID` ni
+     target que el loader detecta y reporta sin eliminar (`memoria.md §5`).
+  2. EDA por cuenta sobre `data/processed/*.parquet`.
+  3. Auditar leakage y cerrar el contrato de datos en `memoria.md §4`.
 
 ## Mapa de extractos por fase (qué leer/tocar sin abrir todo)
 Convención de anclas: `memoria.md` → `§n` y `Dn`; docs de dominio → `## n`;
@@ -78,7 +81,9 @@ decisiones `Dn`. ✅ cumplido.
 
 ### Fase 1 — EDA + contrato de datos ⬅ ACTIVA
 Dueño: `datos.md`.
-- [ ] Consolidar las hojas de detalle en un dataset limpio y tipado.
+- [x] Consolidar las hojas de detalle en un dataset limpio y tipado
+      (`src/loader.py` + `src/build_dataset.py`, 18 tests con fixtures
+      sintéticos; artefactos en `data/processed/`, gitignored).
 - [ ] EDA: distribución de clases (desbalance ya visible), cardinalidad de
       features, valores nulos, duplicados, montos negativos/reclasificaciones.
 - [ ] Análisis de asociación/correlación entre features y target (evitando

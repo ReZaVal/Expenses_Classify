@@ -27,6 +27,9 @@ arranque:
    trabajes fuera de la fase activa sin avisar.**
 3. `memoria.md` — decisiones (`D1..Dn`) y **preguntas abiertas §5**. Nunca
    re-propongas desde cero algo ya decidido ahí.
+3b. `planner.md` — qué tarea concreta toca ahora (`§3` protocolo de apertura,
+   `§4` backlog, `§6` bitácora de la sesión anterior). Se trabaja **contra un ID
+   de tarea**, no "a ver qué hago" (ver `memoria.md D11`).
 4. Si la tarea toca datos/EDA/modelo: lee `datos.md` antes de escribir código.
 5. Si algo en el repo (datos, código, resultados) contradice `memoria.md`, el
    **repo manda**: actualiza `memoria.md` y avísale al usuario.

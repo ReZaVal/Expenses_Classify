@@ -240,6 +240,26 @@ clasificación **granular** que asigna el controller (ej. `CONCEPTO_001`,
   entrenamiento respecto del filtro anterior — es el precio de que la población
   coincida con la definición de negocio.
 
+### D11 — El plan de tareas y el cronograma viven en `planner.md`
+- **Decisión:** se añade un quinto documento al harness, `planner.md`, que
+  descompone las fases de `manager.md` en tareas atómicas (`TX.Y`) ejecutables en
+  **una sesión de 1-2 h**, con dependencias, estimación en sesiones, cronograma
+  referencial y bitácora de sesiones. Parámetros dados por el usuario: **2-3
+  sesiones/semana**, **1-2 h por sesión**, **sin deadline duro**.
+- **Razón:** `manager.md` dice el orden de las fases y cuándo cerrarlas, pero no
+  cuánto trabajo hay dentro de cada una; al retomar en frío no había forma de
+  saber qué tocaba hacer sin re-derivarlo. Separarlo evita inflar `manager.md`
+  con detalle operativo que cambia cada sesión.
+- **Alternativas rechazadas:** meter el backlog dentro de `manager.md` (lo vuelve
+  largo y mezcla "orden estable" con "plan volátil"); usar un issue tracker
+  externo (el harness debe ser autosuficiente en el repo y legible por cualquier
+  modelo en frío); estimar en horas en vez de sesiones (varianza alta en DS, la
+  estimación se incumple siempre).
+- **Impacto:** `manager.md` («Mapa de documentos», «Contexto activo», «Cómo
+  retomar»), `agente.md §2` (orden de lectura). Las fechas del cronograma son
+  **referenciales** y se recalculan al cerrar cada fase; un cambio de plan se
+  registra en `planner.md`, no aquí, salvo que cambie el alcance del proyecto.
+
 ## 4. Contrato de datos / estructura (se llena en Fase 1)
 > Pendiente hasta cerrar §5 P1 (target) y hacer el EDA. Aquí vivirán: columnas
 > oficiales, tipos, qué es feature, qué es target, y qué columnas están

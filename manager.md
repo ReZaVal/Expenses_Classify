@@ -23,7 +23,14 @@ concepto/programa, nombre de la empresa y códigos internos → usar `CUENTA_0X`
 | `datos.md` | ¿Cómo se leen, limpian, exploran y validan los datos? |
 | `modelo.md` | ¿Cómo se entrena, valida y sirve el modelo? (se crea en Fase 2) |
 | `learn.md` | ¿Qué errores se detectaron y qué regla dejaron? |
+| `planner.md` | ¿En cuántas tareas se parte cada fase, cuántas sesiones cuesta y cuándo se estima? |
 | `manager.md` (este) | ¿En qué orden, y cuándo está "listo" cada paso? |
+
+`manager.md` y `planner.md` son complementarios, no redundantes: **este** archivo
+dice el orden de las fases y el criterio para cerrarlas; `planner.md` descompone
+esas fases en tareas atómicas (`TX.Y`) con dependencias, estimación en sesiones y
+cronograma. Si necesitas saber **qué hacer ahora mismo**, la respuesta está en
+`planner.md §4` (primera tarea ⬜ con dependencias ✅).
 
 Regla de oro: si una decisión cambia, se actualiza `memoria.md` primero, y luego
 se ajustan los docs de dominio / el código. No dupliques decisiones —
@@ -39,15 +46,15 @@ regístralo en `learn.md` antes de corregirlo en silencio.
   reclasificaciones/negativos/anulaciones (D7); hoja CUENTA_05 con target en col
   AA y sus filas sin valor fuera (D8); solo cuentan las filas con `ID` (D9); el
   alcance de CUENTA_05 lo define el programa, no la imputación (D10).
-- **Cambió en la última sesión:** Se integró el `D4` de seudonimización que
-  estaba en GitHub con el cierre local de Fase 0 → las decisiones locales se
-  renumeraron a **D5–D8**. Se creó `mapeo_sensibles.json` (local, gitignored)
-  como versión máquina del glosario, y se construyó el loader (`src/config.py`,
-  `src/loader.py`, `src/build_dataset.py`). Sigue abierta solo P4.
-- **Próximos pasos:**
-  1. EDA por cuenta sobre `data/processed/*.parquet` (dataset ya estable:
-     3.521 filas homogéneas + 648 de CUENTA_05).
-  2. Auditar leakage y cerrar el contrato de datos en `memoria.md §4`.
+- **Cambió en la última sesión:** Se añadió `src/asociacion.py` (Cramér's V +
+  perfilado de columnas) con tests, y se creó **`planner.md`** (D11): backlog de
+  28 tareas pendientes, ~35 sesiones, cierre estimado 2026-11-13. Sigue abierta
+  solo P4.
+- **Próximos pasos:** los define `planner.md §4`. La siguiente tarea es
+  **T1.2 — EDA descriptivo de las hojas homogéneas** sobre
+  `data/processed/*.parquet` (dataset estable: 3.521 filas homogéneas + 648 de
+  CUENTA_05). Después: normalizar el target (T1.4), auditar leakage (T1.7) y
+  cerrar el contrato de datos en `memoria.md §4` (T1.8).
 
 ## Mapa de extractos por fase (qué leer/tocar sin abrir todo)
 Convención de anclas: `memoria.md` → `§n` y `Dn`; docs de dominio → `## n`;
@@ -139,6 +146,9 @@ Convención: ⬜ no iniciada · 🟡 en curso · ✅ completada · 🔴 bloquead
 ## Cómo retomar en una sesión nueva
 1. Leer `agente.md`, luego este archivo («Contexto activo» primero).
 2. Leer `memoria.md §5` para ver preguntas abiertas.
-3. Seguir el doc de dominio de la fase activa (`datos.md` en Fase 1).
-4. Al cerrar una decisión o fase: actualizar `memoria.md` primero, luego el
-   estado aquí.
+3. Abrir `planner.md`: seguir el **protocolo de apertura de sesión (§3)** y tomar
+   la primera tarea ⬜ con dependencias ✅ del backlog (§4). La bitácora (§6) dice
+   en qué quedó la sesión anterior.
+4. Seguir el doc de dominio de la fase activa (`datos.md` en Fase 1).
+5. Al cerrar: `memoria.md` primero (si hubo decisión), luego `planner.md` (§4 y
+   §6), luego el estado aquí.

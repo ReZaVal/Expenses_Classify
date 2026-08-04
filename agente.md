@@ -73,7 +73,8 @@ local y proponer diseños: libre.
 prioritaria de `manager.md`):** en todo lo que se versiona van **solo
 seudónimos** (`CUENTA_0X`, `CONCEPTO_0XX`, `EMPRESA_0X`, `IMP_0X`), nunca
 números de cuenta, nombres de concepto/programa, la empresa ni códigos internos
-reales. El mapa real vive solo en `glosario_sensibles.md` (gitignored). **Antes
+reales. Todo lo sensible (data, modelos, informes y el mapa real) vive en
+`local_privado/`, ignorada entera (`memoria.md` D12). **Antes
 de cada commit, verifica que ningún archivo staged contiene términos reales.**
 
 ## 5. Convenciones de comunicación

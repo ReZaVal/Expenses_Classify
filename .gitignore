@@ -1,7 +1,23 @@
-# Datos crudos sensibles (data financiera real) — NUNCA se versionan
-# (decisión cerrada: memoria.md D5, ex-P2).
-data/raw/
-data/processed/
+# ─────────────────────────────────────────────────────────────────────────────
+# TODO lo sensible vive en UNA sola carpeta (memoria.md D12): el Excel crudo,
+# los derivados, los modelos, los informes de EDA y el glosario/mapeo real.
+# Una sola regla = una sola cosa que puede fallar. NUNCA se versiona (D5).
+local_privado/
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Red de seguridad: si alguien crea estas rutas FUERA de local_privado/, tampoco
+# deben llegar a git. Antes vivian aqui como reglas principales (learn.md L3).
+data/
+models/
+reports/
+*.xlsx
+*.xls
+*.csv
+*.parquet
+*.pkl
+*.joblib
+glosario_sensibles.md
+mapeo_sensibles.json
 
 # Python
 __pycache__/
@@ -10,23 +26,8 @@ __pycache__/
 venv/
 .ipynb_checkpoints/
 *.egg-info/
-
-# Informes de EDA: contienen etiquetas y valores reales
-reports/
-
-# Modelos y artefactos pesados
-*.pkl
-*.joblib
-models/*.bin
+.pytest_cache/
 
 # SO / editor
 .DS_Store
 .vscode/
-
-# Data de entrenamiento y validación (si se genera)
-.xlsx
-
-# Glosario de seudónimos: llave real<->seudónimo, SOLO local (nunca a GitHub)
-glosario_sensibles.md
-# Mapa que consume el código (mismos valores reales, formato máquina)
-mapeo_sensibles.json

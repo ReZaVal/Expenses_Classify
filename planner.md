@@ -57,7 +57,7 @@ No se abre una sesión "a ver qué hago": se abre contra un ID de tarea.
 
 **Apertura (5 min, el agente lo hace solo):**
 1. Leer `agente.md` → `manager.md` («Contexto activo») → este archivo.
-2. Verificar que existe `glosario_sensibles.md` **antes** de tocar nada sensible
+2. Verificar que existe `local_privado/` con su glosario **antes** de tocar nada sensible
    (`learn.md L2`). Si no existe, eso es lo primero.
 3. Tomar la **primera tarea ⬜ cuyas dependencias estén todas ✅**. Si hay varias,
    la de menor ID.
@@ -97,7 +97,7 @@ candidatas y prohibidas, validado por el usuario.
 
 | ID | Tarea | Dep. | Ses. | Leer | Tocar | Criterio de salida |
 |---|---|---|---|---|---|---|
-| ✅ T1.0 | Loader reproducible + dataset tipado | — | 2 | — | `src/loader.py`, `src/build_dataset.py` | 18 tests verdes, artefactos en `data/processed/` (hecho, D9/D10) |
+| ✅ T1.0 | Loader reproducible + dataset tipado | — | 2 | — | `src/loader.py`, `src/build_dataset.py` | 18 tests verdes, artefactos en `local_privado/data/processed/` (hecho, D9/D10) |
 | ✅ T1.1 | Herramienta de asociación (Cramér's V + perfilado) | T1.0 | 1 | `datos.md ##3` | `src/asociacion.py` | Módulo con tests (hecho, commit `a1da976`) |
 | ⬜ T1.2 | EDA descriptivo — hojas homogéneas (CUENTA_01–04) | T1.0 | 1 | `datos.md ##3` | `src/eda.py` | Tabla agregada por cuenta: distribución del target, cardinalidad, nulos, duplicados, % de montos negativos. **Sin filas reales** (D5) |
 | ⬜ T1.3 | EDA descriptivo — CUENTA_05 (esquema SAP) | T1.0 | 1 | `datos.md ##2`, `memoria.md D8`,`D10` | `src/eda.py` | Mismo perfilado sobre las 648 filas con target; diferencias de esquema documentadas |
@@ -122,7 +122,7 @@ con métricas registradas y esquema de validación aprobado.
 | ⬜ T2.3 | Baseline honesto por cuenta | T2.2 | 1 | Piso de comparación (clase mayoritaria + regla S→T) con F1 macro y matriz de confusión **por cuenta**. Es el número contra el que se juzga todo lo demás |
 | ⬜ T2.4 | Feature engineering — categóricas | T2.3 | 1 | Codificación decidida por cardinalidad (one-hot / target encoding), sin usar prohibidas |
 | ⬜ T2.5 | Feature engineering — texto (`Descripción`, `Proveedor`) | T2.3 | 2 | Representación de texto (TF-IDF u otra) construida **dentro** del fold, no antes (evita fuga) |
-| ⬜ T2.6 | Primer modelo entrenable por cuenta | T2.4, T2.5 | 2 | N artefactos en `models/`, métricas por cuenta registradas, comparadas contra T2.3 |
+| ⬜ T2.6 | Primer modelo entrenable por cuenta | T2.4, T2.5 | 2 | N artefactos en `local_privado/models/`, métricas por cuenta registradas, comparadas contra T2.3 |
 | 🔒 ⬜ T2.7 | Revisión de resultados con el usuario | T2.6 | 1 | El controller valida si las predicciones "se parecen a lo que él haría". **Cierra la Fase 2** |
 
 **Nota de alcance (D6):** `CUENTA_02` tiene ~61 filas y 10 clases. En T2.6 se
@@ -197,7 +197,8 @@ Una fila por sesión real. Se llena **al cerrar** cada sesión. La columna
 |---|---|---|---|---|---|
 | S-01 | 2026-08-03 | T1.0 | ✅ | Loader + dataset (D9, D10), 18 tests | T1.1 |
 | S-02 | 2026-08-03 | T1.1 | ✅ | `src/asociacion.py` (Cramér's V + perfilado) | T1.2 |
-| S-03 | 2026-08-04 | — | ✅ | Se creó este `planner.md` (plan y cronograma) | **T1.2 — EDA descriptivo de las hojas homogéneas** |
+| S-03 | 2026-08-04 | — | ✅ | Se creó este `planner.md` (plan y cronograma), D11 | T1.2 |
+| S-04 | 2026-08-04 | — | ✅ | D12: todo lo sensible consolidado en `local_privado/` (entregable por canal privado, con `LEEME.md`); `.gitignore` reescrito y bug corregido (L3); rutas de `src/config.py` y docs actualizadas; 30 tests verdes y dataset regenerado | **T1.2 — EDA descriptivo de las hojas homogéneas** |
 
 ## 7. Cómo se mantiene vivo este plan
 - **Al cerrar cada tarea:** marcar ✅ en §4 y añadir la fila en §6. 30 segundos.

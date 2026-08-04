@@ -13,9 +13,16 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
-RUTA_EXCEL = RAIZ / "data" / "raw" / "Clasificacion_de_cuentas_GS_2026.xlsx"
-RUTA_MAPEO = RAIZ / "mapeo_sensibles.json"
-DIR_PROCESADO = RAIZ / "data" / "processed"
+
+# Todo lo sensible cuelga de UNA sola carpeta, gitignoreada entera (memoria.md
+# D12). Si algo del proyecto escribe fuera de aqui, es un bug de seguridad:
+# ninguna ruta de salida debe construirse desde RAIZ directamente.
+DIR_LOCAL = RAIZ / "local_privado"
+RUTA_EXCEL = DIR_LOCAL / "data" / "raw" / "Clasificacion_de_cuentas_GS_2026.xlsx"
+RUTA_MAPEO = DIR_LOCAL / "mapeo_sensibles.json"
+DIR_PROCESADO = DIR_LOCAL / "data" / "processed"
+DIR_MODELOS = DIR_LOCAL / "models"
+DIR_REPORTES = DIR_LOCAL / "reports"
 
 # Cuentas de esquema homogeneo (datos.md ##2). CUENTA_05 va aparte por D8.
 CUENTAS_HOMOGENEAS = ("CUENTA_01", "CUENTA_02", "CUENTA_03", "CUENTA_04")
@@ -57,10 +64,11 @@ class Config:
             if not Path(self.ruta_mapeo).exists():
                 raise FaltaMapeoError(
                     f"Falta mapeo_sensibles.json (buscado en: {self.ruta_mapeo}). "
-                    "Es el mapa seudonimo -> valor real (gitignored). "
-                    "Reconstruyelo desde "
-                    "glosario_sensibles.md; sin el no se sabe que hoja del "
-                    "Excel corresponde a cada CUENTA_0X."
+                    "Es el mapa seudonimo -> valor real y vive en la carpeta "
+                    "local_privado/, que no se versiona: pidesela a quien te "
+                    "paso el proyecto o reconstruyela desde "
+                    "local_privado/glosario_sensibles.md. Sin el no se sabe que "
+                    "hoja del Excel corresponde a cada CUENTA_0X."
                 )
             self._mapeo = json.loads(Path(self.ruta_mapeo).read_text("utf-8"))
         return self._mapeo
@@ -91,6 +99,7 @@ class Config:
         if not ruta.exists():
             raise FileNotFoundError(
                 f"No se encuentra el Excel fuente en {ruta}. Copialo a "
-                "data/raw/ (esa carpeta esta gitignoreada, datos.md ##1)."
+                "local_privado/data/raw/ (toda esa carpeta esta gitignoreada; "
+                "ver local_privado/LEEME.md y datos.md ##1)."
             )
         return ruta

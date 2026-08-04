@@ -22,6 +22,7 @@ registra decisiones): esto registra errores.
 |----|-------------------|----------------|-------------------|
 | L1 | Riesgo de escribir data sensible (cuentas, conceptos, empresa) en docs versionados | Solo seudónimos en lo versionado; valores reales solo en `glosario_sensibles.md` (gitignored) | `memoria.md D4`, `manager.md` (regla de prioridad), `agente.md §4` |
 | L2 | Se seudonimizó sin crear antes el glosario: el mapa real se perdió al cerrar la sesión | El glosario se crea **antes** de aplicar el primer seudónimo, en el mismo cambio | `glosario_sensibles.md §5`, `agente.md §4` |
+| L3 | El `.gitignore` decía `.xlsx` en vez de `*.xlsx`: no ignoraba ningún Excel | Lo sensible se protege con **una sola regla de carpeta** (`local_privado/`), verificada con `git check-ignore`, no con patrones sueltos | `memoria.md D12`, `.gitignore` |
 
 ## 2. Log de errores
 ### L1 — Data sensible podría filtrarse a GitHub vía los docs del harness
@@ -61,6 +62,31 @@ registra decisiones): esto registra errores.
   proteger un dato: es destruirlo. Corolario: como el glosario nunca sube a
   GitHub, cada sesión debe verificar que existe **antes** de tocar nada
   sensible. → propagada a `glosario_sensibles.md §5` y `agente.md §4`.
+
+### L3 — El `.gitignore` no ignoraba los Excel: patrón mal escrito
+- **Estado:** ✅ Resuelto
+- **Detectado en:** sesión del 2026-08-04, al reescribir el `.gitignore` para
+  consolidar lo sensible en `local_privado/` (D12).
+- **Síntoma:** la regla decía **`.xlsx`** (línea 27), que en git significa "un
+  archivo llamado literalmente `.xlsx`", no "todos los archivos `.xlsx`". El
+  patrón correcto es `*.xlsx`. Un Excel con data real dejado en la raíz del repo
+  —o en cualquier carpeta que no fuera `data/raw/`— **se habría podido commitear
+  sin que git lo impidiera**. No llegó a pasar: el crudo siempre estuvo en
+  `data/raw/`, que sí estaba bien ignorada.
+- **Causa raíz:** el `.gitignore` protegía por **acumulación de patrones**
+  (`data/raw/`, `data/processed/`, `models/*.bin`, `.xlsx`, dos archivos por
+  nombre). Seis reglas = seis oportunidades de error, y ninguna se verificó nunca
+  contra git. Un patrón mal escrito falla **en silencio**: no hay error, solo
+  ausencia de protección.
+- **Solución aplicada:** todo lo sensible se movió bajo `local_privado/`, ignorada
+  con **una sola regla de carpeta** (D12), y los patrones sueltos quedaron
+  corregidos (`*.xlsx`, `*.parquet`, `*.csv`) solo como red de seguridad. Se
+  verificó con `git check-ignore -v` sobre archivos reales, no leyendo el archivo.
+- **Regla derivada:** **la protección de datos se verifica ejecutando
+  `git check-ignore`, nunca leyendo el `.gitignore`.** Un patrón que parece
+  correcto puede no serlo, y el fallo es invisible hasta que ya subiste la data.
+  Preferir una regla de carpeta a muchos patrones de archivo. → propagada a
+  `memoria.md D12` y al `.gitignore` (comentario de cabecera).
 
 ## 3. Errores de comportamiento del agente
 (Mismo formato que §2, pero para cuando el agente que dirige el proyecto asumió,

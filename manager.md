@@ -8,8 +8,10 @@ pasar de fase.
 En **todo** lo que se versiona (código y `.md`) van **solo seudónimos**, nunca
 data sensible real. Términos sensibles = números de cuenta, nombres de
 concepto/programa, nombre de la empresa y códigos internos → usar `CUENTA_0X`,
-`CONCEPTO_0XX`, `EMPRESA_0X`, `IMP_0X`. El mapa real ↔ seudónimo vive **solo** en
-`glosario_sensibles.md` (gitignored, nunca a GitHub). Antes de commitear:
+`CONCEPTO_0XX`, `EMPRESA_0X`, `IMP_0X`. **Todo lo sensible (data, modelos,
+informes y el mapa real ↔ seudónimo) vive en `local_privado/`**, ignorada entera
+y nunca versionada (`memoria.md` D12); el mapa está en
+`local_privado/glosario_sensibles.md`. Antes de commitear:
 1. Si introdujiste un término sensible nuevo, agrégalo primero al glosario y usa
    su seudónimo en el doc.
 2. Verifica que ningún `.md`/código staged contiene valores reales
@@ -47,12 +49,14 @@ regístralo en `learn.md` antes de corregirlo en silencio.
   AA y sus filas sin valor fuera (D8); solo cuentan las filas con `ID` (D9); el
   alcance de CUENTA_05 lo define el programa, no la imputación (D10).
 - **Cambió en la última sesión:** Se añadió `src/asociacion.py` (Cramér's V +
-  perfilado de columnas) con tests, y se creó **`planner.md`** (D11): backlog de
-  28 tareas pendientes, ~35 sesiones, cierre estimado 2026-11-13. Sigue abierta
-  solo P4.
+  perfilado) con tests; se creó **`planner.md`** (D11: backlog de 28 tareas,
+  ~35 sesiones, cierre estimado 2026-11-13); y **todo lo no versionado se
+  consolidó en `local_privado/`** (D12) para poder entregarlo por canal privado
+  a colaboradores — de paso se corrigió un `.gitignore` que no ignoraba los
+  Excel (`learn.md L3`). Sigue abierta solo P4.
 - **Próximos pasos:** los define `planner.md §4`. La siguiente tarea es
   **T1.2 — EDA descriptivo de las hojas homogéneas** sobre
-  `data/processed/*.parquet` (dataset estable: 3.521 filas homogéneas + 648 de
+  `local_privado/data/processed/*.parquet` (dataset estable: 3.521 filas homogéneas + 648 de
   CUENTA_05). Después: normalizar el target (T1.4), auditar leakage (T1.7) y
   cerrar el contrato de datos en `memoria.md §4` (T1.8).
 
@@ -66,7 +70,7 @@ no existe donde dice esta tabla, es un error de la tabla → corregirla aquí.
 | Tarea | Leer (contrato/decisión) | Tocar |
 |---|---|---|
 | Montar harness | `agente.md` completo | `*.md` raíz |
-| Reconocer Excel | `datos.md ##1` + `memoria.md §2` | `data/raw/` (local, gitignored) |
+| Reconocer Excel | `datos.md ##1` + `memoria.md §2` | `local_privado/data/raw/` (local, D12) |
 
 ### Fase 1 — EDA + contrato de datos
 | Tarea | Leer (contrato/decisión) | Tocar |
@@ -90,7 +94,7 @@ decisiones `Dn`. ✅ cumplido.
 Dueño: `datos.md`.
 - [x] Consolidar las hojas de detalle en un dataset limpio y tipado
       (`src/loader.py` + `src/build_dataset.py`, 18 tests con fixtures
-      sintéticos; artefactos en `data/processed/`, gitignored).
+      sintéticos; artefactos en `local_privado/data/processed/`).
 - [ ] EDA: distribución de clases (desbalance ya visible), cardinalidad de
       features, valores nulos, duplicados, montos negativos/reclasificaciones.
 - [ ] Análisis de asociación/correlación entre features y target (evitando

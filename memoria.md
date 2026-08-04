@@ -17,7 +17,7 @@ y ser **sostenible y escalable**.
 - Proponer mejoras al harness cuando se detecten (no aplicarlas sin evaluar).
 
 **Fuente de datos:** un Excel de "Clasificación de cuentas GS 2026"
-(`data/raw/Clasificacion_de_cuentas_GS_2026.xlsx`, mantenido local y gitignored
+(`local_privado/data/raw/Clasificacion_de_cuentas_GS_2026.xlsx`, local y nunca versionado
 por defecto — ver §5 P2).
 
 ## 2. Análisis / hallazgos del reconocimiento inicial (Fase 0)
@@ -114,8 +114,9 @@ clasificación **granular** que asigna el controller (ej. `CONCEPTO_001`,
   `manager.md`, etc.) llevan **solo seudónimos** para números de cuenta y
   nombres de concepto/programa, el **nombre de la empresa** y códigos internos
   (`CUENTA_0X`, `CONCEPTO_0XX`, `EMPRESA_0X`, `IMP_0X`). El mapa real ↔ seudónimo
-  vive únicamente en `glosario_sensibles.md`, **gitignoreado** (nunca sube a
-  GitHub). No se usan filtros git de cifrado.
+  vive únicamente en `glosario_sensibles.md` (desde D12, en
+  `local_privado/glosario_sensibles.md`), **gitignoreado** — nunca sube a
+  GitHub. No se usan filtros git de cifrado.
 - **Razón:** proteger data sensible (cuentas, conceptos) sin romper el harness:
   los docs siguen legibles y el clon fresco de cada sesión no necesita llave
   para leerlos (solo para des-seudonimizar, si hace falta, con el glosario
@@ -125,14 +126,14 @@ clasificación **granular** que asigna el controller (ej. `CONCEPTO_001`,
   clean/smudge — rompe la lectura del harness en sesiones futuras (la llave es
   local y el entorno clona en frío) y vuelve ilegibles los diffs; (b) renombrar
   archivos local≠remoto — git no lo soporta y rompe referencias cruzadas.
-- **Impacto:** `glosario_sensibles.md` (local), `.gitignore`, y todos los docs
+- **Impacto:** el glosario (local, hoy en `local_privado/` por D12), `.gitignore`, y todos los docs
   con términos sensibles. Regla operativa en `learn.md L1`.
 
 ### D5 — La data financiera real NUNCA se commitea
 - **Decisión:** el Excel fuente y cualquier derivado con data financiera real de
   EMPRESA_01 **no se versionan en git bajo ninguna circunstancia** (ni en repo privado,
-  ni anonimizados "por si acaso"). Viven solo en local: `data/raw/`,
-  `data/processed/`, `models/` permanecen en `.gitignore`.
+  ni anonimizados "por si acaso"). Viven solo en local, bajo `local_privado/`
+  (ver **D12**), que está ignorada entera en `.gitignore`.
 - **Razón:** el usuario lo definió como restricción dura. Es información
   financiera real de la empresa.
 - **Alternativas rechazadas:** versionar en repo privado (un repo privado puede
@@ -157,7 +158,7 @@ clasificación **granular** que asigna el controller (ej. `CONCEPTO_001`,
   posponer la decisión al EDA (el usuario la cerró ahora).
 - **Impacto:** la partición train/valid/test se hace **dentro de cada cuenta**;
   las métricas se reportan por cuenta (no promediadas a ciegas); habrá N
-  artefactos de modelo en `models/`. La cuenta CUENTA_02 (~61 filas, 10 clases)
+  artefactos de modelo en `local_privado/models/`. La cuenta CUENTA_02 (~61 filas, 10 clases)
   queda con muy pocos datos → se documentará su limitación en Fase 2 en vez de
   fingir una métrica. Pendiente: si el EDA muestra que algunas cuentas comparten
   etiquetas, se podrá proponer compartir representación de texto — sería una
@@ -259,6 +260,31 @@ clasificación **granular** que asigna el controller (ej. `CONCEPTO_001`,
   retomar»), `agente.md §2` (orden de lectura). Las fechas del cronograma son
   **referenciales** y se recalculan al cerrar cada fase; un cambio de plan se
   registra en `planner.md`, no aquí, salvo que cambie el alcance del proyecto.
+
+### D12 — Todo lo no versionado vive en una sola carpeta: `local_privado/`
+- **Decisión:** el Excel crudo, los derivados (`data/processed/`), los modelos,
+  los informes de EDA, `glosario_sensibles.md` y `mapeo_sensibles.json` se mueven
+  bajo **`local_privado/`**, ignorada entera con **una sola regla** de
+  `.gitignore`. Incluye un `LEEME.md` con las reglas de manejo y el instructivo
+  de montaje. Se entrega a los colaboradores **por canal privado**, nunca por
+  git.
+- **Razón:** el usuario necesita pasar el contexto sensible a colaboradores por
+  otro medio, y antes estaba disperso en 4 ubicaciones (`data/raw/`,
+  `data/processed/`, y dos archivos sueltos en la raíz). Además reduce la
+  superficie de error: **una regla que puede fallar en vez de seis**, y un
+  destino de escritura único para el código.
+- **Alternativas rechazadas:** dejarlo disperso y zipear a mano en cada entrega
+  (se olvida un archivo y el colaborador queda sin la llave — es exactamente el
+  fallo de `learn.md L2`); usar un submódulo git privado (sigue siendo git, y D5
+  prohíbe la data en git bajo cualquier forma); cifrar y commitear (rechazado ya
+  en D4).
+- **Impacto:** `.gitignore` (reescrito), `src/config.py` (`DIR_LOCAL` como raíz
+  de toda ruta de salida, más `DIR_MODELOS` y `DIR_REPORTES` para las fases 2-3),
+  `datos.md ##1`, y las referencias de rutas en `manager.md`/`planner.md`. **No
+  cambia D5**: la data sigue sin versionarse nunca; D12 solo cambia *dónde* vive.
+  Regla derivada: **ninguna ruta de salida se construye desde `RAIZ`**, siempre
+  desde `DIR_LOCAL`; escribir fuera es un bug de seguridad. Se corrigió de paso
+  un `.gitignore` roto (`learn.md L3`).
 
 ## 4. Contrato de datos / estructura (se llena en Fase 1)
 > Pendiente hasta cerrar §5 P1 (target) y hacer el EDA. Aquí vivirán: columnas

@@ -5,17 +5,23 @@ aquí?" con **convenciones**, no con decisiones (esas van a `memoria.md`). Dueñ
 de la Fase 1. Cuando arranque el modelado se creará `modelo.md` como par.
 
 ## 1. Fuente y carga
-- Fuente única: `data/raw/Clasificacion_de_cuentas_GS_2026.xlsx` (local,
-  gitignored por defecto — ver `memoria.md §5 P2`). Ubica el archivo ahí antes
-  de correr nada.
+- Fuente única: `local_privado/data/raw/Clasificacion_de_cuentas_GS_2026.xlsx`
+  (local, nunca versionado — `memoria.md` D5 y **D12**). Ubica el archivo ahí
+  antes de correr nada; si falta la carpeta, pídela por canal privado (ver
+  `local_privado/LEEME.md`).
 - Cargar con `pandas.read_excel(..., sheet_name=...)` u `openpyxl` con
   `data_only=True` (el Excel tiene fórmulas; se quiere el valor calculado).
 - Las hojas de detalle tienen el encabezado en la **fila 1**; los datos empiezan
   en la fila 2. Las hojas `Resumen *` y `Sheet1` son tablas dinámicas/resúmenes
   — **no** son fuente de entrenamiento.
-- Estructura de directorios: `data/raw/` (crudo, inmutable), `data/processed/`
-  (derivados reproducibles), `src/` o `notebooks/` (código), `models/`
-  (artefactos). Todos salvo `src/` están gitignored por defecto.
+- Estructura de directorios (`memoria.md` D12): **todo lo sensible cuelga de
+  `local_privado/`** — `data/raw/` (crudo, inmutable), `data/processed/`
+  (derivados reproducibles), `models/` (artefactos) y `reports/` (informes de
+  EDA, que contienen etiquetas reales). El código versionado va en `src/` o
+  `notebooks/`, fuera de esa carpeta.
+- **Regla de escritura:** ninguna ruta de salida se construye desde la raíz del
+  repo; siempre desde `config.DIR_LOCAL` (`DIR_PROCESADO`, `DIR_MODELOS`,
+  `DIR_REPORTES`). Escribir fuera de ahí es un bug de seguridad, no un detalle.
 
 ## 2. Consolidación y limpieza (convenciones)
 - Consolidar las hojas de detalle homogéneas (CUENTA_01–04) en un solo DataFrame
@@ -35,7 +41,7 @@ de la Fase 1. Cuando arranque el modelado se creará `modelo.md` como par.
 - Tipar explícitamente: fechas a `datetime`, montos (`US$`, `NSO`) a numérico,
   categóricas a `category`, IDs a string (no numérico — no son cantidades).
 - **Nunca modificar el crudo.** Toda limpieza produce un artefacto nuevo en
-  `data/processed/`, con el código que lo generó versionado en `src/`.
+  `local_privado/data/processed/`, con el código que lo generó versionado en `src/`.
 - Documentar cada decisión de limpieza no trivial (filas descartadas, imputación
   de nulos) — si cambia el criterio, es una decisión → `memoria.md`.
 

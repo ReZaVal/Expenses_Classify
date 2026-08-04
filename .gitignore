@@ -25,3 +25,5 @@ models/*.bin
 
 # Glosario de seudónimos: llave real<->seudónimo, SOLO local (nunca a GitHub)
 glosario_sensibles.md
+# Mapa que consume el código (mismos valores reales, formato máquina)
+mapeo_sensibles.json

@@ -22,3 +22,6 @@ models/*.bin
 
 # Data de entrenamiento y validación (si se genera)
 .xlsx
+
+# Glosario de seudónimos: llave real<->seudónimo, SOLO local (nunca a GitHub)
+glosario_sensibles.md

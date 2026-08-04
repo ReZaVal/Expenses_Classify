@@ -4,6 +4,17 @@ No explica el cómo (eso está en los docs de dominio): dice en qué orden se ha
 el trabajo, qué documento es dueño de cada pieza, y cuál es el criterio para
 pasar de fase.
 
+## ⚠️ REGLA PRIORITARIA — Seudonimización (leer SIEMPRE, antes de cualquier commit)
+En **todo** lo que se versiona (código y `.md`) van **solo seudónimos**, nunca
+data sensible real. Términos sensibles = números de cuenta, nombres de
+concepto/programa, nombre de la empresa y códigos internos → usar `CUENTA_0X`,
+`CONCEPTO_0XX`, `EMPRESA_0X`, `IMP_0X`. El mapa real ↔ seudónimo vive **solo** en
+`glosario_sensibles.md` (gitignored, nunca a GitHub). Antes de commitear:
+1. Si introdujiste un término sensible nuevo, agrégalo primero al glosario y usa
+   su seudónimo en el doc.
+2. Verifica que ningún `.md`/código staged contiene valores reales
+   (ver `agente.md §4` y `learn.md L1`). Decisión de fondo: `memoria.md D4`.
+
 ## Mapa de documentos
 | Documento | Responde a |
 |---|---|
@@ -28,7 +39,7 @@ regístralo en `learn.md` antes de corregirlo en silencio.
   de datos y distribución del target en `memoria.md §2`. Se cerró P1 → D3.
 - **Próximos pasos:**
   1. Resolver con el usuario P2 (data en git), P3 (alcance), P5 (filas
-     especiales), P6 (hoja 63800010). P4 (loop) puede esperar a Fase 4.
+     especiales), P6 (hoja CUENTA_05). P4 (loop) puede esperar a Fase 4.
   2. Con P3/P5 definidos, arrancar Fase 1 (EDA + contrato de datos).
 
 ## Mapa de extractos por fase (qué leer/tocar sin abrir todo)

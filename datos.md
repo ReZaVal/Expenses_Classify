@@ -18,8 +18,8 @@ de la Fase 1. Cuando arranque el modelado se creará `modelo.md` como par.
   (artefactos). Todos salvo `src/` están gitignored por defecto.
 
 ## 2. Consolidación y limpieza (convenciones)
-- Consolidar las hojas de detalle homogéneas (65910001–04) en un solo DataFrame,
-  agregando la `Cuenta` como columna. La hoja `63800010` tiene otro esquema:
+- Consolidar las hojas de detalle homogéneas (CUENTA_01–04) en un solo DataFrame,
+  agregando la `Cuenta` como columna. La hoja `CUENTA_05` tiene otro esquema:
   tratarla aparte hasta resolver `memoria.md §5 P6`.
 - Tipar explícitamente: fechas a `datetime`, montos (`US$`, `NSO`) a numérico,
   categóricas a `category`, IDs a string (no numérico — no son cantidades).

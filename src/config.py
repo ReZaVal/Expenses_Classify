@@ -20,7 +20,11 @@ DIR_PROCESADO = RAIZ / "data" / "processed"
 # Cuentas de esquema homogeneo (datos.md ##2). CUENTA_05 va aparte por D8.
 CUENTAS_HOMOGENEAS = ("CUENTA_01", "CUENTA_02", "CUENTA_03", "CUENTA_04")
 CUENTA_ESQUEMA_DISTINTO = "CUENTA_05"
-IMPUTACION_EN_ALCANCE = "IMP_01"
+# El alcance de CUENTA_05 lo define el PROGRAMA de financiacion, no el codigo
+# de imputacion: son poblaciones distintas (memoria.md D10).
+PROGRAMA_EN_ALCANCE = "CONCEPTO_007"
+COL_PROGRAMA = "Progr.financiación"
+COL_ID = "ID"
 
 # Posicion del target. En las homogeneas es la col. Excel T (0-based 19) y no
 # tiene encabezado; en CUENTA_05 es la col. AA (0-based 26). Ver memoria.md D3/D8.
@@ -70,10 +74,17 @@ class Config:
 
     def imputacion_de(self, alias: str) -> str:
         """Codigo real de imputacion para un seudonimo."""
-        imputaciones = self.mapeo["imputaciones"]
-        if alias not in imputaciones:
-            raise KeyError(f"{alias} no esta en mapeo_sensibles.json")
-        return imputaciones[alias]
+        return self._traducir("imputaciones", alias)
+
+    def concepto_de(self, alias: str) -> str:
+        """Valor real de un concepto/programa para un seudonimo."""
+        return self._traducir("conceptos", alias)
+
+    def _traducir(self, familia: str, alias: str) -> str:
+        valores = self.mapeo.get(familia, {})
+        if alias not in valores:
+            raise KeyError(f"{alias} no esta en mapeo_sensibles.json ({familia})")
+        return valores[alias]
 
     def verificar_excel(self) -> Path:
         ruta = Path(self.ruta_excel)

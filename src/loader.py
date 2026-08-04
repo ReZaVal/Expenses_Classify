@@ -5,7 +5,11 @@ Reglas que implementa, todas con decision detras:
   como columna porque el entrenamiento es por cuenta.
 - D7: NO se descartan filas por ser contablemente atipicas (negativos,
   reclasificaciones, anulaciones). La unica exclusion permitida es "sin target".
-- D8: CUENTA_05 va por su cuenta, filtrada a IMP_01 y sin las filas sin target.
+- D8: CUENTA_05 va por su cuenta, sin las filas sin target.
+- D9: en las hojas homogeneas, una fila es gasto si tiene ID. Lo que viene
+  despues de la ultima fila con ID es cola (totales, tablas de cuadre).
+- D10: el alcance de CUENTA_05 lo define el PROGRAMA (CONCEPTO_007), no el
+  codigo de imputacion: hay filas con el mismo codigo y otro programa.
 - D4: aqui no aparece ningun nombre real; todo pasa por config.Config.
 """
 from __future__ import annotations
@@ -23,8 +27,8 @@ class InformeCarga:
     filas_por_cuenta: dict[str, int] = field(default_factory=dict)
     etiquetas_colapsadas: dict[str, list[str]] = field(default_factory=dict)
     filas_sin_target: int = 0
-    filas_otra_imputacion: int = 0
-    filas_sospechosas_de_total: dict[str, int] = field(default_factory=dict)
+    filas_fuera_de_alcance: int = 0
+    filas_de_cola: dict[str, int] = field(default_factory=dict)
 
 
 def _normalizar_target(serie: pd.Series) -> tuple[pd.Series, dict]:
@@ -63,17 +67,17 @@ def _tipar(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def _marcar_sospechosas_de_total(df: pd.DataFrame) -> int:
-    """Cuenta filas que parecen totales/subtotales al pie de la hoja.
+def _cortar_cola(df: pd.DataFrame) -> tuple[pd.DataFrame, int]:
+    """Corta la cola de hoja: todo lo que no tiene ID (D9).
 
-    NO las elimina: si son totales hay que excluirlas, pero eso es una decision
-    pendiente (glosario §6). Aqui solo se reportan para el EDA.
+    En las 4 hojas homogeneas las filas sin ID estan SIEMPRE despues de la
+    ultima fila con ID: son la celda de total al pie, filas en blanco y (en una
+    hoja) un bloque de cuadre por centro de costo. No son registros de gasto.
+    Ojo: no sirve filtrar por "sin target", porque una de esas filas de cuadre
+    tiene un numero suelto justo en la columna del target.
     """
-    if "ID" not in df.columns:
-        return 0
-    sin_id = df["ID"].isna()
-    sin_target = df[config.COL_TARGET].isna()
-    return int((sin_id & sin_target).sum())
+    con_id = df[config.COL_ID].notna()
+    return df.loc[con_id].copy(), int((~con_id).sum())
 
 
 def cargar_hojas_homogeneas(cfg: config.Config | None = None,
@@ -94,8 +98,9 @@ def cargar_hojas_homogeneas(cfg: config.Config | None = None,
         df.insert(0, config.COL_CUENTA, alias)
         df = _tipar(df)
 
+        df, n_cola = _cortar_cola(df)
         informe.filas_por_cuenta[alias] = len(df)
-        informe.filas_sospechosas_de_total[alias] = _marcar_sospechosas_de_total(df)
+        informe.filas_de_cola[alias] = n_cola
         for etiqueta, variantes in colapsos.items():
             informe.etiquetas_colapsadas.setdefault(etiqueta, []).extend(variantes)
         piezas.append(df)
@@ -108,7 +113,7 @@ def cargar_hojas_homogeneas(cfg: config.Config | None = None,
 
 def cargar_cuenta_05(cfg: config.Config | None = None,
                      con_informe: bool = False):
-    """Carga la hoja de esquema distinto: filtro IMP_01 y sin filas sin target (D8)."""
+    """Carga la hoja de esquema distinto: alcance por programa (D10), sin filas sin target (D8)."""
     cfg = cfg or config.Config()
     ruta = cfg.verificar_excel()
     informe = InformeCarga()
@@ -120,9 +125,9 @@ def cargar_cuenta_05(cfg: config.Config | None = None,
     df[config.COL_TARGET], colapsos = _normalizar_target(df[config.COL_TARGET])
     informe.etiquetas_colapsadas = {k: sorted(v) for k, v in colapsos.items()}
 
-    imputacion = cfg.imputacion_de(config.IMPUTACION_EN_ALCANCE)
-    en_alcance = df["Imputación"].astype(str).str.strip() == imputacion
-    informe.filas_otra_imputacion = int((~en_alcance).sum())
+    programa = cfg.concepto_de(config.PROGRAMA_EN_ALCANCE)
+    en_alcance = df[config.COL_PROGRAMA].astype(str).str.strip() == programa
+    informe.filas_fuera_de_alcance = int((~en_alcance).sum())
     df = df.loc[en_alcance]
 
     con_target = df[config.COL_TARGET].notna()

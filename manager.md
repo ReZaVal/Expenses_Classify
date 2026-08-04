@@ -37,17 +37,17 @@ regístralo en `learn.md` antes de corregirlo en silencio.
   obligatoria en lo versionado (D4); data real nunca se commitea (D5); **un
   modelo por cuenta contable** (D6); todas las líneas se clasifican, incluidas
   reclasificaciones/negativos/anulaciones (D7); hoja CUENTA_05 con target en col
-  AA y sus 107 filas sin valor fuera (D8).
+  AA y sus filas sin valor fuera (D8); solo cuentan las filas con `ID` (D9); el
+  alcance de CUENTA_05 lo define el programa, no la imputación (D10).
 - **Cambió en la última sesión:** Se integró el `D4` de seudonimización que
   estaba en GitHub con el cierre local de Fase 0 → las decisiones locales se
   renumeraron a **D5–D8**. Se creó `mapeo_sensibles.json` (local, gitignored)
   como versión máquina del glosario, y se construyó el loader (`src/config.py`,
   `src/loader.py`, `src/build_dataset.py`). Sigue abierta solo P4.
 - **Próximos pasos:**
-  1. **P7 (nueva, abierta):** decidir qué hacer con las 115 filas sin `ID` ni
-     target que el loader detecta y reporta sin eliminar (`memoria.md §5`).
-  2. EDA por cuenta sobre `data/processed/*.parquet`.
-  3. Auditar leakage y cerrar el contrato de datos en `memoria.md §4`.
+  1. EDA por cuenta sobre `data/processed/*.parquet` (dataset ya estable:
+     3.521 filas homogéneas + 648 de CUENTA_05).
+  2. Auditar leakage y cerrar el contrato de datos en `memoria.md §4`.
 
 ## Mapa de extractos por fase (qué leer/tocar sin abrir todo)
 Convención de anclas: `memoria.md` → `§n` y `Dn`; docs de dominio → `## n`;
@@ -128,6 +128,7 @@ sin ayuda del agente.
 | Fase | Estado |
 |---|---|
 | 0 — Harness + reconocimiento | ✅ completada (D1–D8) |
+| — dataset base (D9, D10) | ✅ loader + artefactos reproducibles |
 | 1 — EDA + contrato de datos | 🟡 en curso |
 | 2 — Baseline + feature eng. | ⬜ no iniciada |
 | 3 — Validación robusta | ⬜ no iniciada |

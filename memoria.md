@@ -181,6 +181,9 @@ clasificación **granular** que asigna el controller (ej. `CONCEPTO_001`,
   excluirlas.
 
 ### D8 — Hoja CUENTA_05: target = columna AA; las filas sin valor quedan fuera
+> ⚠️ El filtro de esta decisión fue **reemplazado por D10**: el alcance lo define
+> el programa (`CONCEPTO_007`), no el código de imputación. El resto de D8
+> (target = col. AA, filas sin valor fuera) sigue vigente.
 - **Decisión:** la hoja `CUENTA_05` entra al alcance,
   filtrada a `Imputación = IMP_01` (757 de 1094 filas). Su target es la
   **columna final sin encabezado (col 27 / AA)**, análoga a la columna T de las
@@ -198,6 +201,44 @@ clasificación **granular** que asigna el controller (ej. `CONCEPTO_001`,
   descartan filas por ser contablemente atípicas; aquí se excluyen filas **sin
   target**, que es otra cosa. Definir en Fase 1 el criterio exacto de "sin
   valor" (nulo vs. cadena vacía vs. espacios).
+
+### D9 — Una fila es un registro de gasto si tiene `ID`
+- **Decisión:** en las 4 hojas homogéneas, **solo las filas con `ID` entran al
+  dataset**. Todo lo que aparece después de la última fila con `ID` es cola de
+  hoja y se descarta: filas en blanco, la celda de total al pie y —en
+  `CUENTA_04`— un bloque de cuadre (resumen por centro de costo, fila `Total`, y
+  tablas mes a mes con marcas `Ok`).
+- **Razón:** el usuario confirmó los conteos reales de su hoja (950, 61, 270,
+  2240) y el criterio `ID` los reproduce **exactamente**. Esas filas de cola no
+  son gasto: no tienen documento, proveedor ni fecha, solo sumas.
+- **Alternativas rechazadas:** cortar por "fila sin target" — **no funciona**:
+  una fila del bloque de cuadre de `CUENTA_04` tiene un número suelto justo en
+  la columna T y se colaba como si fuera una etiqueta (por eso esa cuenta
+  aparentaba 21 clases en vez de 20). Cortar por posición fija de fila — frágil
+  ante cualquier fila nueva.
+- **Impacto:** el dataset queda en **3.521 filas** (950+61+270+2240). Convive
+  con D7 sin contradicción: D7 protege filas contablemente atípicas
+  (reclasificaciones, negativos, anulaciones), que **sí son gasto y sí tienen
+  `ID`**; D9 excluye filas que no son gasto en absoluto. Corrige además el
+  conteo de clases de `CUENTA_04` a 20, como decía §2.
+
+### D10 — El alcance de CUENTA_05 lo define el programa, no el código de imputación
+- **Decisión:** en la hoja `CUENTA_05`, el alcance es
+  `Progr.financiación = CONCEPTO_007` (**753 de 1094 filas**), no
+  `Imputación = IMP_01`. De esas 753, **648 tienen target** y 105 están en
+  blanco (estas últimas fuera, por D8).
+- **Razón:** el usuario definió el alcance en términos de negocio ("todo lo que
+  venga por reclamos individuales"). Las dos poblaciones **no son la misma**:
+  las 753 filas de `CONCEPTO_007` son todas `IMP_01`, pero `IMP_01` tiene 757
+  filas — incluye 4 de programa `LIQUIDACION` que no son reclamos individuales.
+- **Alternativas rechazadas:** mantener el filtro por imputación (arrastra 4
+  filas de otro programa, 2 de ellas ya clasificadas por el controller); exigir
+  ambas condiciones a la vez (hoy da el mismo resultado, se descartó por no
+  añadir información y ser más rígido de mantener).
+- **Impacto:** reemplaza el filtro de D8. `IMP_01` deja de ser el criterio de
+  alcance y queda solo como dato descriptivo. Se pierden 2 ejemplos de
+  entrenamiento respecto del filtro anterior — es el precio de que la población
+  coincida con la definición de negocio.
 
 ## 4. Contrato de datos / estructura (se llena en Fase 1)
 > Pendiente hasta cerrar §5 P1 (target) y hacer el EDA. Aquí vivirán: columnas
@@ -222,14 +263,10 @@ clasificación **granular** que asigna el controller (ej. `CONCEPTO_001`,
       `Imputación = IMP_01`, target = columna AA, y las 107 filas sin valor
       quedan fuera (no se entrenan ni se predicen).
 
-- [ ] **P7 — Filas sin `ID` ni target (¿totales al pie de hoja?).** El loader
-      detecta **115 filas** sin identificador y sin clasificación
-      (`CUENTA_01`: 4, `CUENTA_02`: 2, `CUENTA_03`: 6, `CUENTA_04`: 103) y las
-      **reporta sin eliminarlas**. La hipótesis es que son filas de
-      total/subtotal al pie de cada hoja, no gasto real — explicarían la
-      diferencia entre las filas del Excel y las documentadas en §2. ¿Se
-      excluyen del dataset? Excluirlas **no** contradice D7 (que habla de filas
-      contablemente atípicas, no de filas que no son un gasto), pero es
-      decisión del usuario. — **Bloquea** cerrar el contrato de datos (§4).
+- [x] **P7 — Filas sin `ID` (cola de hoja).** ✅ RESUELTA → **D9**: una fila es
+      gasto si tiene `ID`; la cola (totales, blancos, bloque de cuadre) se
+      descarta. Dataset = 3.521 filas.
+- [x] **P8 — Alcance real de CUENTA_05.** ✅ RESUELTA → **D10**: lo define el
+      programa (`CONCEPTO_007`, 753 filas), no el código de imputación.
 
-> Preguntas vivas: **P4** (no bloquea) y **P7** (bloquea el contrato de datos).
+> Única pregunta viva: **P4** (loop humano-en-el-medio). No bloquea la Fase 1.

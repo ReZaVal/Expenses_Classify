@@ -45,6 +45,19 @@ def test_consolida_las_cuatro_hojas_homogeneas(cfg):
     assert len(df) == 30 + 12 + 20 + 40
 
 
+def test_corta_la_cola_de_hoja_y_deja_solo_filas_con_id(cfg):
+    """D9: lo que va despues de la ultima fila con ID son totales, no gasto."""
+    df = loader.cargar_hojas_homogeneas(cfg)
+    assert df["ID"].notna().all()
+    assert len(df) == 30 + 12 + 20 + 40  # sin las 2 filas de cola por hoja
+
+
+def test_informa_cuantas_filas_de_cola_se_cortaron(cfg):
+    _, informe = loader.cargar_hojas_homogeneas(cfg, con_informe=True)
+    assert informe.filas_de_cola == {"CUENTA_01": 2, "CUENTA_02": 2,
+                                     "CUENTA_03": 2, "CUENTA_04": 2}
+
+
 def test_ignora_hojas_resumen_y_sheet1(cfg):
     df = loader.cargar_hojas_homogeneas(cfg)
     assert not df["cuenta"].astype(str).str.contains("Resumen|Sheet1").any()
@@ -96,16 +109,23 @@ def test_reporta_el_colapso_de_etiquetas_por_normalizacion(cfg):
 
 # --- hoja de esquema distinto (D8) ------------------------------------------
 
-def test_cuenta_05_filtra_por_imputacion_y_excluye_filas_sin_target(cfg):
+def test_cuenta_05_filtra_por_programa_y_excluye_filas_sin_target(cfg):
+    """D10: el alcance lo define el programa, no el codigo de imputacion."""
     df = loader.cargar_cuenta_05(cfg)
-    assert len(df) == 9, "esperado: 9 con target, 4 sin target, 5 de otra imp."
+    assert len(df) == 9, "esperado: 9 con target, 4 sin target, 5 de otro programa"
     assert df[config.COL_TARGET].notna().all()
+
+
+def test_cuenta_05_excluye_mismo_codigo_pero_otro_programa(cfg):
+    """El caso que motivo D10: mismo codigo de imputacion, programa distinto."""
+    df = loader.cargar_cuenta_05(cfg)
+    assert not df[config.COL_TARGET].str.contains("fuera").any()
 
 
 def test_cuenta_05_informa_cuantas_filas_deja_fuera(cfg):
     _, informe = loader.cargar_cuenta_05(cfg, con_informe=True)
     assert informe.filas_sin_target == 4
-    assert informe.filas_otra_imputacion == 5
+    assert informe.filas_fuera_de_alcance == 5
 
 
 def test_cuenta_05_no_se_mezcla_con_las_homogeneas(cfg):

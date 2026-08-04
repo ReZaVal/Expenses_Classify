@@ -22,8 +22,13 @@ de la Fase 1. Cuando arranque el modelado se creará `modelo.md` como par.
   **tipado**, agregando la `Cuenta` como columna. Ojo: consolidar es para
   limpiar y explorar de forma uniforme; el entrenamiento es **por cuenta**
   (`memoria.md D6`). La hoja `CUENTA_05` tiene otro esquema y su propio target
-  (`memoria.md D8`): pipeline aparte, filtrada a `Imputación = IMP_01` y sin
-  las filas con AA vacía.
+  (`memoria.md D8`): pipeline aparte, con alcance `Progr.financiación =
+  CONCEPTO_007` (`memoria.md D10` — **no** por código de imputación) y sin las
+  filas con AA vacía.
+- **Una fila es un registro de gasto si tiene `ID`** (`memoria.md D9`). Todo lo
+  que va después de la última fila con `ID` es cola de hoja (blancos, total al
+  pie, bloque de cuadre) y no entra. No usar "sin target" como criterio de
+  corte: hay una fila de cuadre con un número suelto en la columna del target.
 - **No se descartan filas por ser contablemente atípicas** (reclasificaciones,
   liquidaciones, montos negativos, anulaciones): son ejemplos válidos
   (`memoria.md D7`). La única exclusión permitida es "fila sin target" (D8).

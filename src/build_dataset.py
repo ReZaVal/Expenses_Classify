@@ -16,16 +16,15 @@ def _reportar(nombre: str, df, informe: loader.InformeCarga) -> None:
     print(f"  filas por cuenta: {informe.filas_por_cuenta}")
     clases = df.groupby(config.COL_CUENTA)[config.COL_TARGET].nunique().to_dict()
     print(f"  clases distintas en el target: {clases}")
-    if informe.filas_sin_target or informe.filas_otra_imputacion:
+    if informe.filas_sin_target or informe.filas_fuera_de_alcance:
         print(f"  excluidas -> sin target: {informe.filas_sin_target} | "
-              f"fuera del filtro de imputacion: {informe.filas_otra_imputacion}")
+              f"fuera de alcance (otro programa): {informe.filas_fuera_de_alcance}")
     if informe.etiquetas_colapsadas:
         print(f"  etiquetas colapsadas al normalizar: "
               f"{informe.etiquetas_colapsadas}")
-    sospechosas = {k: v for k, v in informe.filas_sospechosas_de_total.items() if v}
-    if sospechosas:
-        print(f"  ¡ATENCION! filas sin ID y sin target (¿totales al pie?): "
-              f"{sospechosas} -> NO se eliminaron; decision pendiente.")
+    cola = {k: v for k, v in informe.filas_de_cola.items() if v}
+    if cola:
+        print(f"  cola de hoja cortada (sin ID, D9): {cola}")
 
 
 def main() -> None:

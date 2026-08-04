@@ -18,6 +18,7 @@ HOJAS_FALSAS = {
     "CUENTA_05": {"cuenta": "20000005", "hoja": "20000005_Epsilon"},
 }
 IMP_FALSA = "XXXX-0000"
+PROGRAMA_FALSO = "PROGRAMA_EN_ALCANCE"
 
 COLS_DETALLE = [
     "ID", "Cuenta", "Sociedad", "División", "Periodo", "mes num", "Proveedor",
@@ -43,6 +44,11 @@ def _hoja_detalle(n_filas: int, etiquetas: list[str]) -> pd.DataFrame:
         fila[18] = f"ConceptoSAP{i % 3}"
         fila[19] = etiquetas[i % len(etiquetas)]
         filas.append(fila)
+    # Cola de hoja: 1 fila vacia + 1 con un total suelto. Sin ID (D9).
+    vacia = [None] * len(COLS_DETALLE)
+    total = [None] * len(COLS_DETALLE)
+    total[17] = 999999.0
+    filas.extend([vacia, total])
     return pd.DataFrame(filas, columns=COLS_DETALLE)
 
 
@@ -51,19 +57,21 @@ def _hoja_cuenta_05(n_con_target: int, n_sin_target: int,
     """Hoja de esquema distinto: 27 columnas, target en indice 26 (col AA)."""
     cols = [f"col_{i}" for i in range(27)]
     cols[3] = "Imputación"
+    cols[7] = "Progr.financiación"
     cols[26] = "Unnamed: 26"
     filas = []
     for i in range(n_con_target):
         f = [None] * 27
-        f[0], f[3], f[26] = f"A{i}", IMP_FALSA, f"Etiqueta_{i % 3}"
+        f[0], f[3], f[7], f[26] = f"A{i}", IMP_FALSA, PROGRAMA_FALSO, f"Etiqueta_{i % 3}"
         filas.append(f)
     for i in range(n_sin_target):
         f = [None] * 27
-        f[0], f[3], f[26] = f"B{i}", IMP_FALSA, None
+        f[0], f[3], f[7], f[26] = f"B{i}", IMP_FALSA, PROGRAMA_FALSO, None
         filas.append(f)
     for i in range(n_otra_imputacion):
         f = [None] * 27
-        f[0], f[3], f[26] = f"C{i}", "OTRA-9999", f"Etiqueta_fuera_{i}"
+        # mismo codigo de imputacion pero OTRO programa: deben quedar fuera (D10)
+        f[0], f[3], f[7], f[26] = f"C{i}", IMP_FALSA, "OTRO_PROGRAMA", f"Etiqueta_fuera_{i}"
         filas.append(f)
     return pd.DataFrame(filas, columns=cols)
 
@@ -76,6 +84,7 @@ def mapeo_falso(tmp_path):
         "empresa": {"EMPRESA_01": "ACME"},
         "cuentas": HOJAS_FALSAS,
         "imputaciones": {"IMP_01": IMP_FALSA},
+        "conceptos": {"CONCEPTO_007": PROGRAMA_FALSO},
     }), encoding="utf-8")
     return ruta
 

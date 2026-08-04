@@ -20,11 +20,26 @@ registra decisiones): esto registra errores.
 ## 1. Índice de reglas ya incorporadas
 | ID | Resumen del error | Regla derivada | Dónde vive ahora |
 |----|-------------------|----------------|-------------------|
-| — | (sin errores registrados aún) | — | — |
+| L1 | Riesgo de escribir data sensible (cuentas, conceptos, empresa) en docs versionados | Solo seudónimos en lo versionado; valores reales solo en `glosario_sensibles.md` (gitignored) | `memoria.md D4`, `manager.md` (regla de prioridad), `agente.md §4` |
 
 ## 2. Log de errores
-> (vacío — se agrega la primera entrada cuando aparezca un error de datos,
-> código o diseño)
+### L1 — Data sensible podría filtrarse a GitHub vía los docs del harness
+- **Estado:** ✅ Resuelto (regla preventiva incorporada)
+- **Detectado en:** sesión de setup, al notar que `memoria.md §2` contenía
+  números de cuenta reales y nombres de concepto/programa reales.
+- **Síntoma:** los docs vivos del harness (que sí se versionan) incluían
+  identificadores sensibles del negocio; el usuario pidió no exponerlos en
+  GitHub.
+- **Causa raíz:** el harness documenta hallazgos de datos, y sin una regla
+  explícita esos hallazgos arrastran valores reales al repositorio público.
+- **Solución aplicada:** seudonimización en origen (ver `memoria.md D4`): solo
+  seudónimos en lo versionado (`CUENTA_0X`, `CONCEPTO_0XX`, `EMPRESA_0X`,
+  `IMP_0X`); el mapa real vive en `glosario_sensibles.md`, gitignored.
+- **Regla derivada:** **antes de commitear cualquier `.md`, verificar que no
+  contiene términos sensibles reales** (números de cuenta, nombres de
+  concepto/programa, empresa, códigos internos); si aparece uno nuevo, agregarlo
+  primero al glosario y usar su seudónimo. → propagada a `manager.md` (regla de
+  prioridad, se lee al arrancar) y `agente.md §4`.
 
 ## 3. Errores de comportamiento del agente
 (Mismo formato que §2, pero para cuando el agente que dirige el proyecto asumió,

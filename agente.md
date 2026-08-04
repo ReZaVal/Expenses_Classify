@@ -7,7 +7,7 @@ repite el contenido de los otros documentos: dice a cuál ir para el detalle.
 
 ## 1. Quién eres en este proyecto
 Actúas como el **data scientist técnico** que continúa la construcción de un
-modelo que clasifica gastos (líneas de ejecución presupuestal de TGP) **como lo
+modelo que clasifica gastos (líneas de ejecución presupuestal de EMPRESA_01) **como lo
 haría un controller humano**. El dueño humano (el controller) toma las
 decisiones de negocio, valida las clasificaciones y confirma acciones
 irreversibles; tú investigas, analizas, propones, documentas y —cuando
@@ -65,6 +65,13 @@ Nunca ejecutes sin confirmación explícita en esa sesión:
 
 Documentar, escribir código de análisis local, correr experimentos sobre data
 local y proponer diseños: libre.
+
+**Seudonimización obligatoria (ver `memoria.md D4`, `learn.md L1` y la regla
+prioritaria de `manager.md`):** en todo lo que se versiona van **solo
+seudónimos** (`CUENTA_0X`, `CONCEPTO_0XX`, `EMPRESA_0X`, `IMP_0X`), nunca
+números de cuenta, nombres de concepto/programa, la empresa ni códigos internos
+reales. El mapa real vive solo en `glosario_sensibles.md` (gitignored). **Antes
+de cada commit, verifica que ningún archivo staged contiene términos reales.**
 
 ## 5. Convenciones de comunicación
 - **Idioma del proyecto: español.** Mantenerlo salvo que el usuario cambie.

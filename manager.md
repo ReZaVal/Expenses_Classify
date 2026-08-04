@@ -4,6 +4,17 @@ No explica el cómo (eso está en los docs de dominio): dice en qué orden se ha
 el trabajo, qué documento es dueño de cada pieza, y cuál es el criterio para
 pasar de fase.
 
+## ⚠️ REGLA PRIORITARIA — Seudonimización (leer SIEMPRE, antes de cualquier commit)
+En **todo** lo que se versiona (código y `.md`) van **solo seudónimos**, nunca
+data sensible real. Términos sensibles = números de cuenta, nombres de
+concepto/programa, nombre de la empresa y códigos internos → usar `CUENTA_0X`,
+`CONCEPTO_0XX`, `EMPRESA_0X`, `IMP_0X`. El mapa real ↔ seudónimo vive **solo** en
+`glosario_sensibles.md` (gitignored, nunca a GitHub). Antes de commitear:
+1. Si introdujiste un término sensible nuevo, agrégalo primero al glosario y usa
+   su seudónimo en el doc.
+2. Verifica que ningún `.md`/código staged contiene valores reales
+   (ver `agente.md §4` y `learn.md L1`). Decisión de fondo: `memoria.md D4`.
+
 ## Mapa de documentos
 | Documento | Responde a |
 |---|---|
@@ -21,13 +32,15 @@ regístralo en `learn.md` antes de corregirlo en silencio.
 
 ## Contexto activo (lo primero que se lee al arrancar; mantener corto)
 - **En qué estoy:** Fase 0 cerrada. **Fase 1 (EDA + contrato de datos) lista
-  para arrancar.** Decisiones vigentes: target = columna T (D3); data real nunca
-  se commitea (D4); **un modelo por cuenta contable** (D5); todas las líneas se
-  clasifican, incluidas reclasificaciones/negativos/anulaciones (D6); hoja
-  63800010 con target en col AA y sus 107 filas sin valor fuera (D7).
-- **Cambió en la última sesión:** Se cerraron P2, P3, P5 y P6 → **D4, D5, D6,
-  D7**. Solo queda abierta P4 (diseño del loop humano-en-el-medio), que no
-  bloquea la Fase 1.
+  para arrancar.** Decisiones vigentes: target = columna T (D3); seudonimización
+  obligatoria en lo versionado (D4); data real nunca se commitea (D5); **un
+  modelo por cuenta contable** (D6); todas las líneas se clasifican, incluidas
+  reclasificaciones/negativos/anulaciones (D7); hoja CUENTA_05 con target en col
+  AA y sus 107 filas sin valor fuera (D8).
+- **Cambió en la última sesión:** Se cerraron P2, P3, P5 y P6 → **D5, D6, D7,
+  D8** (renumeradas al integrar el `D4` de seudonimización publicado en GitHub).
+  Solo queda abierta P4 (diseño del loop humano-en-el-medio), que no bloquea la
+  Fase 1.
 - **Próximos pasos:**
   1. Fase 1: script reproducible de carga/consolidación en `src/` (data local,
      nunca commiteada) + EDA por cuenta.
@@ -48,7 +61,7 @@ no existe donde dice esta tabla, es un error de la tabla → corregirla aquí.
 ### Fase 1 — EDA + contrato de datos
 | Tarea | Leer (contrato/decisión) | Tocar |
 |---|---|---|
-| Cargar/consolidar | `datos.md ##1` + `##2` + `memoria.md D5..D7` | `src/` |
+| Cargar/consolidar | `datos.md ##1` + `##2` + `memoria.md D6..D8` | `src/` |
 | EDA / correlaciones | `datos.md ##2` + `##3` | `notebooks/` o `src/eda.py` |
 | Detectar leakage | `datos.md ##4` | `memoria.md §4` (contrato de datos) |
 
@@ -58,7 +71,7 @@ Dueño: `agente.md` + `datos.md`.
 - [x] Instalar los 4 documentos núcleo + entrada `CLAUDE.md`/`AGENTS.md`.
 - [x] Reconocimiento inicial de la estructura del Excel.
 - [x] Resolver las preguntas fundacionales con el usuario (`memoria.md §5`):
-      P1→D3, P2→D4, P3→D5, P5→D6, P6→D7. **P4 (loop humano-en-el-medio) se
+      P1→D3, P2→D5, P3→D6, P5→D7, P6→D8. **P4 (loop humano-en-el-medio) se
       pospone a la Fase 4 por decisión de orden**, no bloquea nada antes.
 Criterio de salida: harness instalado y preguntas fundacionales promovidas a
 decisiones `Dn`. ✅ cumplido.
@@ -109,7 +122,7 @@ sin ayuda del agente.
 ## Estado actual (actualizar en cada sesión)
 | Fase | Estado |
 |---|---|
-| 0 — Harness + reconocimiento | ✅ completada (D1–D7) |
+| 0 — Harness + reconocimiento | ✅ completada (D1–D8) |
 | 1 — EDA + contrato de datos | 🟡 en curso |
 | 2 — Baseline + feature eng. | ⬜ no iniciada |
 | 3 — Validación robusta | ⬜ no iniciada |

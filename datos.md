@@ -18,15 +18,15 @@ de la Fase 1. Cuando arranque el modelado se creará `modelo.md` como par.
   (artefactos). Todos salvo `src/` están gitignored por defecto.
 
 ## 2. Consolidación y limpieza (convenciones)
-- Consolidar las hojas de detalle homogéneas (65910001–04) en un solo DataFrame
+- Consolidar las hojas de detalle homogéneas (CUENTA_01–04) en un solo DataFrame
   **tipado**, agregando la `Cuenta` como columna. Ojo: consolidar es para
   limpiar y explorar de forma uniforme; el entrenamiento es **por cuenta**
-  (`memoria.md D5`). La hoja `63800010` tiene otro esquema y su propio target
-  (`memoria.md D7`): pipeline aparte, filtrada a `Imputación = TGCI-2601` y sin
+  (`memoria.md D6`). La hoja `CUENTA_05` tiene otro esquema y su propio target
+  (`memoria.md D8`): pipeline aparte, filtrada a `Imputación = IMP_01` y sin
   las filas con AA vacía.
 - **No se descartan filas por ser contablemente atípicas** (reclasificaciones,
   liquidaciones, montos negativos, anulaciones): son ejemplos válidos
-  (`memoria.md D6`). La única exclusión permitida es "fila sin target" (D7).
+  (`memoria.md D7`). La única exclusión permitida es "fila sin target" (D8).
 - Tipar explícitamente: fechas a `datetime`, montos (`US$`, `NSO`) a numérico,
   categóricas a `category`, IDs a string (no numérico — no son cantidades).
 - **Nunca modificar el crudo.** Toda limpieza produce un artefacto nuevo en
@@ -58,7 +58,7 @@ consecuencia, es leakage y se prohíbe.
   peor que nada: engaña al usuario).
 
 ## 5. Partición y validación (anti-overfitting)
-- La partición se hace **dentro de cada cuenta contable** (`memoria.md D5`): no
+- La partición se hace **dentro de cada cuenta contable** (`memoria.md D6`): no
   se mezclan cuentas en train/test, y las métricas se reportan por cuenta.
 - Definir el esquema de validación **antes** de entrenar y documentarlo en
   `memoria.md`. Candidatos según la naturaleza del dato:

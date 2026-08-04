@@ -1,5 +1,5 @@
-# Datos crudos sensibles (data financiera real) — NO versionar hasta
-# decisión explícita del usuario (ver memoria.md §5, pregunta P2).
+# Datos crudos sensibles (data financiera real) — NUNCA se versionan
+# (decisión cerrada: memoria.md D5, ex-P2).
 data/raw/
 data/processed/
 
@@ -22,3 +22,6 @@ models/*.bin
 
 # Data de entrenamiento y validación (si se genera)
 .xlsx
+
+# Glosario de seudónimos: llave real<->seudónimo, SOLO local (nunca a GitHub)
+glosario_sensibles.md

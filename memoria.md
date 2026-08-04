@@ -5,7 +5,7 @@ que ya está aquí sin que el usuario pida revisarlo.
 
 ## 1. Contexto del proyecto
 **Objetivo:** construir un modelo de data science que clasifique gastos (líneas
-de ejecución presupuestal de TGP) **como lo haría un controller humano**, para
+de ejecución presupuestal de EMPRESA_01) **como lo haría un controller humano**, para
 apoyar la toma de decisiones. El modelo debe **consultar al humano** las
 clasificaciones dudosas hasta estar entrenado (human-in-the-loop), y construirse
 con las mejores prácticas: buscar correlaciones reales, **evitar overfitting**,
@@ -27,11 +27,11 @@ El Excel tiene **11 hojas**: hojas de **detalle** por cuenta contable y hojas
 **Hojas de detalle (candidatas a dataset de entrenamiento):**
 | Hoja | Cuenta | Filas de datos aprox. | Clases en `Concepto` |
 |---|---|---|---|
-| `65910001 - Relacionamiento` | 65910001 | ~950 | 6 |
-| `65910002 - Inv. Social` | 65910002 | ~61 | 7 |
-| `65910003 - Gest. Riesgos` | 65910003 | ~270 | 8 |
-| `65910004 - Gest. Rec. Ind.` | 65910004 | ~2240 | 7 |
-| `63800010_Ser. Imagen Satelital` | 63800010 | ~1090 | estructura DISTINTA |
+| `CUENTA_01` | CUENTA_01 | ~950 | 6 |
+| `CUENTA_02` | CUENTA_02 | ~61 | 7 |
+| `CUENTA_03` | CUENTA_03 | ~270 | 8 |
+| `CUENTA_04` | CUENTA_04 | ~2240 | 7 |
+| `CUENTA_05` | CUENTA_05 | ~1090 | estructura DISTINTA |
 
 **Columnas de las 4 primeras hojas de detalle (encabezado en fila 1):**
 `ID, Cuenta, Sociedad, División, Periodo, (mes num), Proveedor, Descripción,
@@ -41,18 +41,18 @@ Descripción_Concepto`.
 
 **TARGET (confirmado por el usuario, ver D3):** la variable a predecir es la
 **columna T** (letra Excel T = índice 20), sin encabezado en el Excel. Es la
-clasificación **granular** que asigna el controller (ej. `Plan de
-Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
+clasificación **granular** que asigna el controller (ej. `CONCEPTO_001`,
+`CONCEPTO_004`). La **columna S** (`Concepto`,
 índice 19) **NO es el target**: viene de SAP, la ingresan los usuarios, y es un
 **feature** legítimo (existe antes de la clasificación del controller).
 
 **Distribución del target (columna T) por hoja de detalle:**
 | Hoja | Clases en T | Clase mayoritaria (aprox) |
 |---|---|---|
-| 65910001 | 21 | `Plan de Relacionamiento - Sierra` (264/950) |
-| 65910002 | 10 | `Becas Chiquintirca - Prov` (19/61) |
-| 65910003 | 14 | `Logistica espacios de diálogo` (125/270) |
-| 65910004 | 20 | `NUEVA PROV CHIQUI` (716/2240) |
+| CUENTA_01 | 21 | `CONCEPTO_001` (264/950) |
+| CUENTA_02 | 10 | `CONCEPTO_002` (19/61) |
+| CUENTA_03 | 14 | `CONCEPTO_003` (125/270) |
+| CUENTA_04 | 20 | `CONCEPTO_004` (716/2240) |
 
 **Observaciones clave (hipótesis, a validar en Fase 1 — NO son decisiones):**
 - La columna S (`Concepto`, de SAP) es probablemente un **predictor fuerte** de
@@ -63,7 +63,7 @@ Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
   para aprenderlas/validarlas.
 - Cada cuenta tiene un **espacio de etiquetas propio** (T distinto por cuenta) →
   afecta el alcance del modelo (§5 P3).
-- El target T tiene **problemas de higiene**: espacios finales (`'Otros costos '`),
+- El target T tiene **problemas de higiene**: espacios finales (`'CONCEPTO_006 '`),
   mayúsculas/minúsculas inconsistentes, nombres heterogéneos (programas vs.
   refinamientos geográficos) → normalizar antes de entrenar.
 - Aparecen filas de **"Reclasificación"** también en el target T, además de
@@ -71,7 +71,7 @@ Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
 - Las columnas `Id_Concepto` / `Descripción_Concepto` (W/X) en la hoja 1 parecen
   una **lista de referencia** pegada al costado, NO alineada fila-a-fila. **A
   verificar** antes de usarlas (riesgo de leakage/confusión).
-- La hoja `63800010` tiene un **esquema totalmente distinto** (columnas tipo
+- La hoja `CUENTA_05` tiene un **esquema totalmente distinto** (columnas tipo
   export SAP: Asiento contable, Cuenta de mayor, Clave contab., etc.) → puede
   requerir tratamiento aparte o quedar fuera del primer alcance.
 - Riesgo de **data leakage**: columnas como `Descripción_Concepto`, `NSO`,
@@ -92,7 +92,7 @@ Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
 
 ### D2 — Idioma del proyecto: español
 - **Decisión:** todo el harness y la comunicación en español.
-- **Razón:** es el idioma del usuario y del dominio (contabilidad TGP).
+- **Razón:** es el idioma del usuario y del dominio (contabilidad EMPRESA_01).
 - **Alternativas rechazadas:** inglés (fricción innecesaria para quien mantiene).
 - **Impacto:** todos los documentos y comentarios de código de cara al usuario.
 
@@ -109,9 +109,28 @@ Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
   modelado. Nombre canónico a asignar a la columna T (no tiene header) →
   propuesta: `clasificacion_controller` (a confirmar al armar el contrato §4).
 
-### D4 — La data financiera real NUNCA se commitea
+### D4 — Seudonimización en origen de términos sensibles en los docs
+- **Decisión:** los documentos versionados (`memoria.md`, `datos.md`,
+  `manager.md`, etc.) llevan **solo seudónimos** para números de cuenta y
+  nombres de concepto/programa, el **nombre de la empresa** y códigos internos
+  (`CUENTA_0X`, `CONCEPTO_0XX`, `EMPRESA_0X`, `IMP_0X`). El mapa real ↔ seudónimo
+  vive únicamente en `glosario_sensibles.md`, **gitignoreado** (nunca sube a
+  GitHub). No se usan filtros git de cifrado.
+- **Razón:** proteger data sensible (cuentas, conceptos) sin romper el harness:
+  los docs siguen legibles y el clon fresco de cada sesión no necesita llave
+  para leerlos (solo para des-seudonimizar, si hace falta, con el glosario
+  local). Alcance acordado con el usuario: cuentas, conceptos/programas, nombre
+  de la empresa y códigos internos.
+- **Alternativas rechazadas:** (a) cifrado letra↔dígito con filtros
+  clean/smudge — rompe la lectura del harness en sesiones futuras (la llave es
+  local y el entorno clona en frío) y vuelve ilegibles los diffs; (b) renombrar
+  archivos local≠remoto — git no lo soporta y rompe referencias cruzadas.
+- **Impacto:** `glosario_sensibles.md` (local), `.gitignore`, y todos los docs
+  con términos sensibles. Regla operativa en `learn.md L1`.
+
+### D5 — La data financiera real NUNCA se commitea
 - **Decisión:** el Excel fuente y cualquier derivado con data financiera real de
-  TGP **no se versionan en git bajo ninguna circunstancia** (ni en repo privado,
+  EMPRESA_01 **no se versionan en git bajo ninguna circunstancia** (ni en repo privado,
   ni anonimizados "por si acaso"). Viven solo en local: `data/raw/`,
   `data/processed/`, `models/` permanecen en `.gitignore`.
 - **Razón:** el usuario lo definió como restricción dura. Es información
@@ -125,9 +144,9 @@ Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
   (`datos.md ##6.7`). Los ejemplos que se peguen en docs deben ser sintéticos o
   agregados, no filas reales.
 
-### D5 — Alcance: un modelo por cuenta contable
+### D6 — Alcance: un modelo por cuenta contable
 - **Decisión:** se entrena **un modelo independiente por cuenta contable**
-  (65910001, 65910002, 65910003, 65910004 y 63800010), no un modelo global
+  (CUENTA_01, CUENTA_02, CUENTA_03, CUENTA_04 y CUENTA_05), no un modelo global
   multi-cuenta.
 - **Razón:** cada cuenta tiene su propio espacio de etiquetas en la columna T
   (ver §2) y su propia semántica de negocio; mezclarlas obligaría al modelo a
@@ -138,13 +157,13 @@ Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
   posponer la decisión al EDA (el usuario la cerró ahora).
 - **Impacto:** la partición train/valid/test se hace **dentro de cada cuenta**;
   las métricas se reportan por cuenta (no promediadas a ciegas); habrá N
-  artefactos de modelo en `models/`. La cuenta 65910002 (~61 filas, 10 clases)
+  artefactos de modelo en `models/`. La cuenta CUENTA_02 (~61 filas, 10 clases)
   queda con muy pocos datos → se documentará su limitación en Fase 2 en vez de
   fingir una métrica. Pendiente: si el EDA muestra que algunas cuentas comparten
   etiquetas, se podrá proponer compartir representación de texto — sería una
   decisión nueva, no un cambio silencioso.
 
-### D6 — Todas las líneas se clasifican (no hay filas "de descarte")
+### D7 — Todas las líneas se clasifican (no hay filas "de descarte")
 - **Decisión:** las filas de "Reclasificación", "Liquidación de orden", montos
   negativos y anulaciones son **ejemplos de entrenamiento válidos**. Todo
   concepto debe quedar clasificado; no se excluyen filas del dataset por ser
@@ -161,9 +180,9 @@ Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
   modelo falla sistemáticamente ahí, es hallazgo a reportar, no motivo para
   excluirlas.
 
-### D7 — Hoja 63800010: target = columna AA; las filas sin valor quedan fuera
-- **Decisión:** la hoja `63800010_Ser. Imagen Satelital` entra al alcance,
-  filtrada a `Imputación = TGCI-2601` (757 de 1094 filas). Su target es la
+### D8 — Hoja CUENTA_05: target = columna AA; las filas sin valor quedan fuera
+- **Decisión:** la hoja `CUENTA_05` entra al alcance,
+  filtrada a `Imputación = IMP_01` (757 de 1094 filas). Su target es la
   **columna final sin encabezado (col 27 / AA)**, análoga a la columna T de las
   otras hojas. Las **107 filas sin valor en AA se dejan en blanco**: no se usan
   para entrenar y el modelo **tampoco las predice** (quedan fuera del alcance de
@@ -174,8 +193,8 @@ Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
 - **Alternativas rechazadas:** dejar la hoja fuera del proyecto; tratar las 107
   filas en blanco como una clase más o pedir que el modelo las clasifique.
 - **Impacto:** esta cuenta tiene un esquema de features **completamente
-  distinto** (export SAP) → su pipeline de features es propio, coherente con D5
-  (un modelo por cuenta). Convive con D6 sin contradicción: D6 dice que no se
+  distinto** (export SAP) → su pipeline de features es propio, coherente con D6
+  (un modelo por cuenta). Convive con D7 sin contradicción: D7 dice que no se
   descartan filas por ser contablemente atípicas; aquí se excluyen filas **sin
   target**, que es otra cosa. Definir en Fase 1 el criterio exacto de "sin
   valor" (nulo vs. cadena vacía vs. espacios).
@@ -189,18 +208,18 @@ Relacionamiento - Sierra`, `NUEVA PROV CHIQUI`). La **columna S** (`Concepto`,
 - [x] **P1 — Variable objetivo.** ✅ RESUELTA → **D3**: el target es la columna
       T (clasificación granular del controller). La columna S (`Concepto`) es un
       feature que viene de SAP.
-- [x] **P2 — Sensibilidad de datos.** ✅ RESUELTA → **D4**: la data financiera
+- [x] **P2 — Sensibilidad de datos.** ✅ RESUELTA → **D5**: la data financiera
       real **nunca** se commitea; vive solo en local (`.gitignore`).
-- [x] **P3 — Alcance del modelo.** ✅ RESUELTA → **D5**: un modelo independiente
+- [x] **P3 — Alcance del modelo.** ✅ RESUELTA → **D6**: un modelo independiente
       por cuenta contable.
 - [ ] **P4 — Diseño del loop humano-en-el-medio.** ¿Aprendizaje activo (el
       modelo pregunta solo lo de baja confianza y re-entrena), validación por
       lotes, o se diseña más adelante con una propuesta del agente? — **Bloquea**
       la Fase 4.
-- [x] **P5 — Tratamiento de filas especiales.** ✅ RESUELTA → **D6**: son
+- [x] **P5 — Tratamiento de filas especiales.** ✅ RESUELTA → **D7**: son
       ejemplos válidos; todos los conceptos deben clasificarse.
-- [x] **P6 — Hoja 63800010 (esquema distinto).** ✅ RESUELTA → **D7**: filtrar a
-      `Imputación = TGCI-2601`, target = columna AA, y las 107 filas sin valor
+- [x] **P6 — Hoja CUENTA_05 (esquema distinto).** ✅ RESUELTA → **D8**: filtrar a
+      `Imputación = IMP_01`, target = columna AA, y las 107 filas sin valor
       quedan fuera (no se entrenan ni se predicen).
 
 > Única pregunta viva: **P4**. No bloquea la Fase 1.
